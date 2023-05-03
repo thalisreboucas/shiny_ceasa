@@ -1,17 +1,13 @@
 library(pacman)
-pacman::p_load(shiny,shinydashboard,bs4Dash,bs4cards,waiter,thematic,shinythemes)
-pacman::p_load(readxl,# Open Data in Xl (Excel)
-               dplyr,
-               zoo,
-               DT,
-               plotly, # Making dynamic graphs
+pacman::p_load(shiny,shinydashboard,
+               bs4Dash,bs4cards,waiter,
+               thematic,shinythemes,DT,zoo,plotly, # Making dynamic graphs
                modeltime, # Times model classics 
                tidyverse, # All tidy for manipulation
                timetk, # Making a tables and graph's of timeseries
                lubridate, # Working if date
                easystats, # making a spells on the datas.
                imputeTS)
-
 
 thematic_shiny()
 
@@ -59,9 +55,16 @@ actual_price_tab <- tabItem(
       status = "primary", 
       solidHeader = TRUE, 
       collapsible = TRUE,
+      sidebar = boxSidebar(
+        startOpen = FALSE,
+        id = "mycardsidebar",
+        background = "#ffffff",
+        dateRangeInput('dateRange',
+                       label = 'Filter crimes by date',
+                       start = as.Date('2018-01-01') , end = as.Date('2018-06-01'))),
+      
       DT::dataTableOutput("tbl",width = '1000px')
-    )
-  ),
+    )),
   fluidRow(
     box(
       title = "Tabela de com escala e dispersão", 
@@ -779,6 +782,7 @@ shinyApp(
       data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
         dplyr::group_by(my,Produto) %>% 
           dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>%
+          dplyr::arrange(desc(my)) %>% 
             tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
                            values_from = value)    %>%  
                              datatable(filter = 'top', options = list(
@@ -787,10 +791,20 @@ shinyApp(
     
     output$tbl_eda_1 <- renderTable({ data %>%
                                        dplyr::group_by(id) %>%
-                                       dplyr::filter(id == item()) %>%  datawizard::describe_distribution()
+                                       dplyr::filter(id == item()) %>%  datawizard::describe_distribution( ) 
                                      
     })
     
+  # output$tbl_1 <- DT::renderDataTable({
+  # data %>%   dplyr::group_by(Produto) %>% 
+  #   dplyr::filter(date >= "2023-03-02" & date <= last(date))
+  # dplyr::arrange(desc(date)) %>%  
+  #   tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
+  #                      values_from = value)    %>%  
+  #   datatable(filter = 'top', options = list(
+  #     pageLength = 10, autoWidth = TRUE))
+  # })
+  # 
     # card API ----------------------------------------------------------------
     
     output$cardAPIPlot <- renderPlot({

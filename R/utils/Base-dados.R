@@ -4,7 +4,7 @@ pacman::p_load(readxl,# Open Data in Xl (Excel)
                zoo)
 
 # Base preço dos alimentos Ceasa
-Dados_Ceasa_Preco <- read_excel("E:/edime/Thalis/MEU/Ceasa/shiny-ceasa/R/utils/Dados.xlsx", 
+Dados_Ceasa_Preco <- read_excel("E:/edime/Thalis/MEU/Ceasa/shiny_ceasa/R/utils/Dados.xlsx", 
                                 col_types = c("text", "text", "text", "numeric", "date"))
 
 

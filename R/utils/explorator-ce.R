@@ -58,12 +58,25 @@ EDA <- function(product_id){
   
 }
 
-tbl <- data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
+
+
+######## Finalizado.
+
+  data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
   dplyr::group_by(my,Produto) %>% 
   dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>% 
+  dplyr::arrange(desc(my)) %>% 
   tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
-                     values_from = value)    %>%  datatable(filter = 'top', options = list(
+                     values_from = value)    %>% 
+  datatable(filter = 'top', options = list(
                        pageLength = 10, autoWidth = TRUE))
 
-
+  data %>%   dplyr::group_by(Produto) %>% 
+    dplyr::filter(date >= "2023-03-02" & date <= last(date))
+    dplyr::arrange(desc(date)) %>%  
+    tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
+                       values_from = value)    %>%  
+    datatable(filter = 'top', options = list(
+                         pageLength = 10, autoWidth = TRUE))
+    
 
