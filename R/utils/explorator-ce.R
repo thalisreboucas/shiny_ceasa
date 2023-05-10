@@ -1,16 +1,3 @@
-# AED CEASA -----
-library(pacman)
-pacman::p_load(readxl,# Open Data in Xl (Excel)
-               dplyr,
-               zoo,
-               DT,
-               plotly, # Making dynamic graphs
-               modeltime, # Times model classics 
-               tidyverse, # All tidy for manipulation
-               timetk, # Making a tables and graph's of timeseries
-               lubridate, # Working if date
-               easystats, # making a spells on the datas.
-               imputeTS)
 
 ############
 EDA <- function(product_id){ 
@@ -59,7 +46,53 @@ EDA <- function(product_id){
 }
 
 
+dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+  add_lines(x = ~date,
+            y = ~observed,
+            line = list(color = "rgb(105, 175, 94)"),
+            name = "Dados") %>%
+  add_lines(x = ~date , y = ~trend , name ="tendência" ,
+            line = list(color = "rgb(4, 86, 74)")) %>% 
+  layout(showlegend = T,
+         title='',
+         yaxis = list(title = "Preço",
+                      tickprefix = "R$",
+                      gridcolor = 'ffff'),
+         xaxis = list(title = "Dia",
+                      gridcolor = 'ffff',
+                      rangeslider = list(visible = T)))
 
+### grafico  de anomalia 
+
+dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+  add_lines(x = ~date,
+            y = ~observed,
+            line = list(color = "rgb(105, 175, 94)"),
+            name = "Dados") %>%
+  add_ribbons(x = ~date,
+              ymin = ~recomposed_l1,
+              ymax = ~recomposed_l2,
+              line = list(color = "rgba(105, 172, 135 ,0.5)"),
+              fillcolor = "rgba(105, 172, 135, 0.3)",
+              name = "95% Intervalo de confiança") %>% 
+   add_markers(x = ~date,
+               y = ~observed,
+               marker = list(color = "#ff0000"),
+               data = dt %>% 
+                 tk_anomaly_diagnostics(.value = value,.date_var = date) %>% 
+                 dplyr::filter(anomaly == "Yes") ,
+               name = 'Anomalia')%>%
+  layout(showlegend = T,
+         title='Gráfico de Anomalia',
+         yaxis = list(title = "Preço",
+                      tickprefix = "R$",
+                      gridcolor = 'ffff'),
+         xaxis = list(title = "Dia",
+                      gridcolor = 'ffff',
+                      rangeslider = list(visible = T)))
+
+
+plot_anomaly_diagnostics()
 ######## Finalizado.
 
   data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
@@ -78,5 +111,20 @@ EDA <- function(product_id){
                        values_from = value)    %>%  
     datatable(filter = 'top', options = list(
                          pageLength = 10, autoWidth = TRUE))
+   
     
+    #### tabela de descrição  
+    data %>%
+      dplyr::group_by(id) %>%
+      dplyr::filter(id == 1) %>% 
+      dplyr::summarize( Mínimo = min(value),
+                        Média = mean(value),`Desvio Padrão` = sd(value) , 
+                        IQR = IQR(value) , 
+                        Curtose = as.numeric(kurtosis(value)) , 
+                        Assimetria = as.numeric(skewness(value)),
+                        Q1 = stats::quantile(value,probs = 0.25, na.rm = TRUE), 
+                        Mediana = median(value),
+                        Q3 = stats::quantile(value,probs = 0.75, na.rm = TRUE),
+                        Maxímo = max(value),
+                        Amplitude = (max(value) -min(value))) %>% knitr::kable()
 

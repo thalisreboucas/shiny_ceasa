@@ -7,7 +7,8 @@ pacman::p_load(shiny,shinydashboard,
                timetk, # Making a tables and graph's of timeseries
                lubridate, # Working if date
                easystats, # making a spells on the datas.
-               imputeTS)
+               imputeTS,
+               readxl)
 
 thematic_shiny()
 
@@ -60,8 +61,8 @@ actual_price_tab <- tabItem(
         id = "mycardsidebar",
         background = "#ffffff",
         dateRangeInput('dateRange',
-                       label = 'Filter crimes by date',
-                       start = as.Date('2018-01-01') , end = as.Date('2018-06-01'))),
+                       label = 'Filtro de dados para os itens',language = "portuguese",
+                       start = as.Date('2015-01-01') , end = as.Date(today()))),
       
       DT::dataTableOutput("tbl",width = '1000px')
     )),
@@ -732,18 +733,56 @@ shinyApp(
       data %>%
         dplyr::group_by(id) %>%
         dplyr::filter(id == item()) %>% 
-        timetk::plot_time_series( .date_var    = date,
-                                  .value       = value,
-                                  .interactive = T)
+        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+        add_lines(x = ~date,
+                  y = ~observed,
+                  line = list(color = "rgb(105, 175, 94)"),
+                  name = "Dados") %>%
+        add_lines(x = ~date , y = ~trend , name ="tendência" ,
+                  line = list(color = "rgb(4, 86, 74)")) %>% 
+        layout(showlegend = T,
+               title='',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = "Dia",
+                            gridcolor = 'ffff',
+                            rangeslider = list(visible = T)))
+      
       })
     
     output$plot_an <-  plotly::renderPlotly({
       data %>%
         dplyr::group_by(id) %>%
         dplyr::filter(id == item()) %>% 
-        plot_anomaly_diagnostics(date,
-                                 value,
-                                 .interactive = T)
+        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+        add_lines(x = ~date,
+                  y = ~observed,
+                  line = list(color = "rgb(105, 175, 94)"),
+                  name = "Dados") %>%
+        add_ribbons(x = ~date,
+                    ymin = ~recomposed_l1,
+                    ymax = ~recomposed_l2,
+                    line = list(color = "rgba(105, 172, 135 ,0.5)"),
+                    fillcolor = "rgba(105, 172, 135, 0.3)",
+                    name = "95% Intervalo de confiança") %>% 
+        add_markers(x = ~date,
+                    y = ~observed,
+                    marker = list(color = "#ff0000"),
+                    data = dt %>% 
+                      tk_anomaly_diagnostics(.value = value,.date_var = date) %>% 
+                      dplyr::filter(anomaly == "Yes") ,
+                    name = 'Anomalia')%>%
+        layout(showlegend = T,
+               title='',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = "Dia",
+                            gridcolor = 'ffff',
+                            rangeslider = list(visible = T)))
+      
+      
     })
 
     output$plot_sd <-  plotly::renderPlotly({
@@ -785,13 +824,22 @@ shinyApp(
           dplyr::arrange(desc(my)) %>% 
             tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
                            values_from = value)    %>%  
-                             datatable(filter = 'top', options = list(
+                             DT::datatable(filter = 'top', options = list(
                               pageLength = 10, autoWidth = TRUE,scrollX = TRUE)) 
       })
     
     output$tbl_eda_1 <- renderTable({ data %>%
                                        dplyr::group_by(id) %>%
-                                       dplyr::filter(id == item()) %>%  datawizard::describe_distribution( ) 
+                                       dplyr::filter(id == item()) %>%  dplyr::summarize( Mínimo = min(value),
+                                                                                          Média = mean(value),`Desvio Padrão` = sd(value) , 
+                                                                                          IQR = IQR(value) , 
+                                                                                          Curtose = as.numeric(kurtosis(value)) , 
+                                                                                          Assimetria = as.numeric(skewness(value)),
+                                                                                          Q1 = stats::quantile(value,probs = 0.25, na.rm = TRUE), 
+                                                                                          Mediana = median(value),
+                                                                                          Q3 = stats::quantile(value,probs = 0.75, na.rm = TRUE),
+                                                                                          Maxímo = max(value),
+                                                                                          Amplitude = (max(value) -min(value))) 
                                      
     })
     
@@ -801,7 +849,7 @@ shinyApp(
   # dplyr::arrange(desc(date)) %>%  
   #   tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
   #                      values_from = value)    %>%  
-  #   datatable(filter = 'top', options = list(
+  #   DT::datatable(filter = 'top', options = list(
   #     pageLength = 10, autoWidth = TRUE))
   # })
   # 
