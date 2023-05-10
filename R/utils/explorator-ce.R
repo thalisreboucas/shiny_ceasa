@@ -45,6 +45,7 @@ EDA <- function(product_id){
   
 }
 
+### grafico padrão 
 
 dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
   add_lines(x = ~date,
@@ -92,7 +93,25 @@ dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>
                       rangeslider = list(visible = T)))
 
 
-plot_anomaly_diagnostics()
+### box plot
+dt %>% plot_ly(
+  y = ~value,
+  type = 'violin',
+  color = I("rgba(105, 172, 135 ,0.8)"),
+  box = list(
+    visible = T
+  ),
+  meanline = list(
+    visible = T
+  ),
+  x0 = ' '
+) %>% 
+  layout(showlegend = F,
+         title=' ',
+         yaxis = list(title = "Preço",
+                      tickprefix = "R$",
+                      gridcolor = 'ffff'))
+
 ######## Finalizado.
 
   data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 

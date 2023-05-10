@@ -68,7 +68,7 @@ actual_price_tab <- tabItem(
     )),
   fluidRow(
     box(
-      title = "Tabela de com escala e dispersão", 
+      title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
       width = 10,
       solidHeader = TRUE, 
@@ -76,6 +76,19 @@ actual_price_tab <- tabItem(
       collapsible = TRUE,
       tableOutput("tbl_eda_1")
     ),
+    
+    box(
+      title = "Tabela com medidas de escala e dispersão", 
+      closable = FALSE, 
+      width = 8,
+      solidHeader = TRUE, 
+      status = "primary",
+      collapsible = TRUE,
+      plotly::plotlyOutput("plot_violin")
+    )
+    
+    
+    ,
     box(
       title = "Gráfico de Serie temporal", 
       width = 12,
@@ -791,6 +804,33 @@ shinyApp(
         dplyr::filter(id == item()) %>% 
         plot_seasonal_diagnostics(date, value, .interactive = T)
     })
+    
+    
+    
+    output$plot_violin <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        plot_ly(
+          y = ~value,
+          type = 'violin',
+          color = I("rgba(105, 172, 135 ,0.8)"),
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          ),
+          x0 = ' '
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'))
+      
+    })
+    
     
     
     output$plot_stl <-  plotly::renderPlotly({
