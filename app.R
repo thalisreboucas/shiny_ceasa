@@ -782,7 +782,9 @@ shinyApp(
         add_markers(x = ~date,
                     y = ~observed,
                     marker = list(color = "#ff0000"),
-                    data = dt %>% 
+                    data =  data %>%
+                      dplyr::group_by(id) %>%
+                      dplyr::filter(id == item()) %>%  
                       tk_anomaly_diagnostics(.value = value,.date_var = date) %>% 
                       dplyr::filter(anomaly == "Yes") ,
                     name = 'Anomalia')%>%
