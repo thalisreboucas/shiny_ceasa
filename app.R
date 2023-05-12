@@ -49,23 +49,36 @@ statusColors <- c(
 actual_price_tab <- tabItem(
   tabName = "cards",
   fluidRow(
-    box(
+    tabBox(
       title = "Tabela de Preços da Ceasa", 
       closable = F, 
       width = 12,
       status = "primary", 
       solidHeader = TRUE, 
       collapsible = TRUE,
+      type = "tabs",
+      selected = "Tab 2",
       sidebar = boxSidebar(
         startOpen = FALSE,
         id = "mycardsidebar",
         background = "#ffffff",
         dateRangeInput('dateRange',
-                       label = 'Filtro de dados para os itens',language = "portuguese",
-                       start = as.Date('2015-01-01') , end = as.Date(today()))),
-      
+                       label = 'Filtro de dados para os itens',
+                       language = "portuguese",
+                       min = min(data$date),
+                       max = max(data$date),
+                       start = max(data$date) , 
+                       end = min(data$date) ,
+                       format = "dd/mm/yyyy" ,
+                       separator = "Até" )),
+      tabPanel(
+        "Média Mensal",
       DT::dataTableOutput("tbl",width = '1000px')
-    )),
+    ) ,
+    tabPanel(
+      "Preço diário",
+      DT::dataTableOutput("tbl_1",width = '1000px')
+   ))) ,
   fluidRow(
     box(
       title = "Tabela com medidas de escala e dispersão", 
@@ -338,10 +351,6 @@ theory_tab <- tabItem(
     column(
       width = 6,
       tabBox(
-        ribbon(
-          text = "Tabs",
-          color = "pink"
-        ),
         title = "A card with tabs",
         elevation = 2,
         id = "tabcard1",
@@ -861,6 +870,7 @@ shinyApp(
     ##### tab 1 ---- actual price ###################
     output$tbl <- DT::renderDataTable({
       data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
+        dplyr::filter( date >= input$dateRange[2] &  date <= input$dateRange[1] ) %>% 
         dplyr::group_by(my,Produto) %>% 
           dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>%
           dplyr::arrange(desc(my)) %>% 
@@ -869,6 +879,8 @@ shinyApp(
                              DT::datatable(filter = 'top', options = list(
                               pageLength = 10, autoWidth = TRUE,scrollX = TRUE)) 
       })
+    
+    ###### tab de explorator data --- ########################
     
     output$tbl_eda_1 <- renderTable({ data %>%
                                        dplyr::group_by(id) %>%
@@ -885,16 +897,16 @@ shinyApp(
                                      
     })
     
-  # output$tbl_1 <- DT::renderDataTable({
-  # data %>%   dplyr::group_by(Produto) %>% 
-  #   dplyr::filter(date >= "2023-03-02" & date <= last(date))
-  # dplyr::arrange(desc(date)) %>%  
-  #   tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
-  #                      values_from = value)    %>%  
-  #   DT::datatable(filter = 'top', options = list(
-  #     pageLength = 10, autoWidth = TRUE))
-  # })
-  # 
+   output$tbl_1 <- DT::renderDataTable({
+   data %>% dplyr::group_by(Produto) %>% 
+     dplyr::filter(date >= input$dateRange[2] & date <= input$dateRange[1] ) %>% 
+   dplyr::arrange(desc(date)) %>%  
+     tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
+                        values_from = value)    %>%  
+     DT::datatable(filter = 'top', options = list(
+       pageLength = 10, autoWidth = TRUE,scrollX = TRUE))
+   })
+   
     # card API ----------------------------------------------------------------
     
     output$cardAPIPlot <- renderPlot({
