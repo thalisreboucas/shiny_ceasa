@@ -63,11 +63,11 @@ actual_price_tab <- tabItem(
   fluidRow(
     tabBox(
       title = "Tabela de Preços da Ceasa", 
-      closable = F, 
+      closable = FALSE, 
       width = 12,
       status = "primary", 
       solidHeader = TRUE, 
-      collapsible = TRUE,
+      collapsible = FALSE,
       type = "tabs",
       selected = "Preço diário",
       sidebar = boxSidebar(
@@ -85,11 +85,11 @@ actual_price_tab <- tabItem(
                        separator = "Até" )),
       tabPanel(
         "Média Mensal",
-      DT::dataTableOutput("tbl",width = '1000px')
+      DT::dataTableOutput("tbl",width = '1200px')
     ) ,
     tabPanel(
       "Preço diário",
-      DT::dataTableOutput("tbl_1",width = '1000px')
+      DT::dataTableOutput("tbl_1",width = '1200px')
    ))) 
 
   )
@@ -99,10 +99,61 @@ actual_price_tab <- tabItem(
  analises_tab <- tabItem(
   tabName = "analises_tab",
   fluidRow(
+    selectInput(
+      inputId = "item",
+      label = "Escolha o item:",
+      c(
+        "ABACATE"=1,
+        "ABACAXI"=2,
+        "ABOBORA"=3,
+        "ABOBRINHA"=4,
+        "ALFACE"=5,
+        "ALHO"=6,
+        "BANANA NANICA"=7,
+        "BANANA PRATA"=8,
+        "BATATA"=9,
+        "BATATA DOCE"=10,
+        "BERINJELA"=11,
+        "BETERRABA"=12,
+        "BROCOLO"=13,
+        "CARA"=14,
+        "CEBOLA"=15,
+        "CENOURA"=16,
+        "CHUCHU"=17,
+        "COCO VERDE"=18,
+        "COUVE"=19,
+        "COUVE-FLOR"=20,
+        "GOIABA"=21,
+        "INHAME"=22,
+        "JILO"=23,
+        "LARANJA PERA"=24,
+        "LIMAO TAHITI"=25,
+        "MACA"=26,
+        "MAMAO FORMOSA"=27,
+        "MAMAO HAWAY"=28,
+        "MANDIOCA"=29,
+        "MANDIOQUINHA"=30,
+        "MANGA"=31,
+        "MARACUJA AZEDO"=32,
+        "MELANCIA"=33,
+        "MELAO AMARELO"=34,
+        "MILHO VERDE"=35,
+        "MORANGO"=36,
+        "OVOS"=37,
+        "PEPINO"=38,
+        "PERA IMPORTADA"=39,
+        "PIMENTAO VERDE"=40,
+        "QUIABO"=41,
+        "REPOLHO"=42,
+        "TANGERINA"=43,
+        "TOMATE"=44,
+        "UVA ITALIA"=45,
+        "UVA NIAGARA"=46,
+        "VAGEM"=47)),
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
-      width = 10,
+      width = 12,
       solidHeader = TRUE, 
       status = "primary",
       collapsible = TRUE,
@@ -112,16 +163,15 @@ actual_price_tab <- tabItem(
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
-      width = 8,
+      width = 10,
       solidHeader = TRUE, 
       status = "primary",
       collapsible = TRUE,
       plotly::plotlyOutput("plot_violin")
     )
-    
-    
-    ,
-    box(
+  ),
+  fluidRow(
+    tabBox(
       title = "Gráfico de Serie temporal", 
       width = 12,
       status = "primary", 
@@ -129,21 +179,15 @@ actual_price_tab <- tabItem(
       maximizable = TRUE, 
       solidHeader = TRUE,
       collapsible = TRUE,
-      plotly::plotlyOutput("plot_eda")
+      type = "tabs",
+      selected = "Preço diário",
+      tabPanel("Gráfico de Tendência",plotly::plotlyOutput("plot_eda")),
+      tabPanel("Grafico de Anomalia",plotly::plotlyOutput("plot_an"))
+      
     )
   ),
   
   fluidRow(
-    box(
-      title = "Grafico de Anomalia", 
-      closable = FALSE, 
-      width = 12,
-      maximizable = TRUE, 
-      solidHeader = TRUE, 
-      status = "primary",
-      collapsible = TRUE,
-      plotly::plotlyOutput("plot_an")
-    ),
     box(
       title = "Grafico S-diag", 
       width = 12,
@@ -173,9 +217,9 @@ actual_price_tab <- tabItem(
       solidHeader = TRUE, 
       collapsible = TRUE,
       plotly::plotlyOutput("plot_stl")
-    )
+    ))
 
-))
+)
 
 
 # forcast_model_tab ---- #########################
@@ -519,12 +563,7 @@ shinyApp(
         image = "https://play-lh.googleusercontent.com/kFwgSRrveDZRgkGWmItfpADxlPoQeRCnhSLqHBE8sT71UoMOqdzchTcF-dHzsOwnzK0",
         opacity = 0.95
       ),
-      fixed = TRUE,
-      tooltip(
-        title = "Esse botão fecha ou abre o menu de filtros.",
-        placement = "bottom",
-        actionButton(inputId = "controlbarToggle", label = "Filtros", class = "mx-2")
-      ),
+      fixed = T,
       rightUi = tagList(
         dropdownMenu(
           badgeStatus = "danger",
@@ -557,7 +596,8 @@ shinyApp(
       )
     ),
     sidebar = dashboardSidebar(
-      fixed = TRUE,
+      fixed = T,collapsed = T,
+      expandOnHover = F,
       skin = "light",
       status = "primary",
       id = "sidebar",
@@ -576,21 +616,19 @@ shinyApp(
         menuItem(
           "Tabela de Preço Atual",
           tabName = "tab_prices",
-          icon = icon("sliders")
+          icon = icon("th")
         ),
         menuItem(
           "Análise de dados",
-          badgeLabel = "New",
-          badgeColor = "success",
           tabName = "analises_tab",
-          icon = icon("th")
+          icon = icon("chart-bar")
         ),
         
         sidebarHeader("Modelos"),
         menuItem(
           "Modelos de Previsão",
           tabName = "forecast_tab",
-          icon = icon("dashboard")
+          icon = icon("chart-line")
         ),
         menuItem(
           "Teoria dos Modelos",
@@ -609,85 +647,16 @@ shinyApp(
         theory_tab
       )
     ),
-    controlbar = dashboardControlbar(
-      id = "controlbar",
-      skin = "light",
-      pinned = FALSE,
-      overlay = FALSE,
-      controlbarMenu(
-        id = "controlbarMenu",
-        type = "pills",
-        controlbarItem(
-          "Itens",
-          column(
-            width = 12,
-            align = "center",
-            radioButtons(
-              inputId = "item",
-              label = "Escolha o item:",
-              c(
-                "ABACATE"=1,
-                "ABACAXI"=2,
-                "ABOBORA"=3,
-                "ABOBRINHA"=4,
-                "ALFACE"=5,
-                "ALHO"=6,
-                "BANANA NANICA"=7,
-                "BANANA PRATA"=8,
-                "BATATA"=9,
-                "BATATA DOCE"=10,
-                "BERINJELA"=11,
-                "BETERRABA"=12,
-                "BROCOLO"=13,
-                "CARA"=14,
-                "CEBOLA"=15,
-                "CENOURA"=16,
-                "CHUCHU"=17,
-                "COCO VERDE"=18,
-                "COUVE"=19,
-                "COUVE-FLOR"=20,
-                "GOIABA"=21,
-                "INHAME"=22,
-                "JILO"=23,
-                "LARANJA PERA"=24,
-                "LIMAO TAHITI"=25,
-                "MACA"=26,
-                "MAMAO FORMOSA"=27,
-                "MAMAO HAWAY"=28,
-                "MANDIOCA"=29,
-                "MANDIOQUINHA"=30,
-                "MANGA"=31,
-                "MARACUJA AZEDO"=32,
-                "MELANCIA"=33,
-                "MELAO AMARELO"=34,
-                "MILHO VERDE"=35,
-                "MORANGO"=36,
-                "OVOS"=37,
-                "PEPINO"=38,
-                "PERA IMPORTADA"=39,
-                "PIMENTAO VERDE"=40,
-                "QUIABO"=41,
-                "REPOLHO"=42,
-                "TANGERINA"=43,
-                "TOMATE"=44,
-                "UVA ITALIA"=45,
-                "UVA NIAGARA"=46,
-                "VAGEM"=47
-                
-              )
-            )
-          )
-        )
-      )
-    ),
     footer = dashboardFooter(
       fixed = FALSE,
       right = "© THALIS REBOUÇAS 2023 / TODOS OS DIREITOS RESERVADOS."
     ),
     title = "Ceasa dash"
   ),
+  
+  ################################ server ##################
   server = function(input, output, session) {
-    useAutoColor()
+    useAutoColor(T)
     item <- reactive(as.numeric({input$item}))
     # alerts ------------------------------------------------------------------
     observeEvent(input$show_alert, {
@@ -933,7 +902,7 @@ shinyApp(
     observeEvent(input$sidebar, {
       toastOpts$class <- if (input$sidebar) "bg-success" else "bg-danger"
       toast(
-        title = if (input$sidebar) "Sidebar opened!" else "Sidebar is closed!",
+        title = if (input$sidebar) "Sidebar Está aberta!" else "Sidebar está fechada!",
         options = toastOpts
       )
     })
@@ -943,45 +912,6 @@ shinyApp(
     observeEvent(input$update_tabBox2, {
       updateBox("tabcard2_box", action = "toggleMaximize")
     })
-    
-    # controlbar input --------------------------------------------------------
-    
-    observeEvent(input$controlbar, {
-      toastOpts <- list(
-        autohide = TRUE,
-        icon = "fas fa-home",
-        close = FALSE,
-        position = "bottomRight"
-      )
-      toastOpts$class <- if (input$controlbar) "bg-success" else "bg-danger"
-      toast(
-        title = if (input$controlbar) "Controlbar opened!" else "Controlbar closed!",
-        options = toastOpts
-      )
-    })
-    
-    observeEvent(input$controlbarToggle, {
-      updateControlbar(id = "controlbar")
-    })
-    
-    observe({
-      print(input$controlbar)
-    })
-    
-    
-    observeEvent(input$dropdown_item2, {
-      toast(
-        title = "I am a toast!",
-        options = list(
-          autohide = TRUE,
-          icon = "fas fa-home",
-          close = FALSE,
-          position = "topLeft",
-          class = "bg-orange"
-        )
-      )
-    })
-    
     
     # update sidebar ----------------------------------------------------------
     
