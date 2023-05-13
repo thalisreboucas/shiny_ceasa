@@ -1,6 +1,6 @@
 library(pacman)
 pacman::p_load(shiny,shinydashboard,
-               bs4Dash,bs4cards,waiter,
+               bs4Dash,bs4cards,waiter,fresh,
                thematic,shinythemes,DT,zoo,plotly, # Making dynamic graphs
                modeltime, # Times model classics 
                tidyverse, # All tidy for manipulation
@@ -43,11 +43,23 @@ statusColors <- c(
   "pink",
   "white"
 )
-
+##################### my theme ###########
+mytheme <- create_theme(
+  bs4dash_vars(
+    navbar_light_hover_color = "#3BA368"
+  ),
+  bs4dash_sidebar_light(
+    hover_color = "#3BA368"
+  ),
+  bs4dash_status(
+    primary = "#3BA368", danger = "#D10003"
+  ),
+  bs4dash_vars()
+)
 
 # actual_price_tab  ###################
 actual_price_tab <- tabItem(
-  tabName = "cards",
+  tabName = "tab_prices",
   fluidRow(
     tabBox(
       title = "Tabela de Preços da Ceasa", 
@@ -57,7 +69,7 @@ actual_price_tab <- tabItem(
       solidHeader = TRUE, 
       collapsible = TRUE,
       type = "tabs",
-      selected = "Tab 2",
+      selected = "Preço diário",
       sidebar = boxSidebar(
         startOpen = FALSE,
         id = "mycardsidebar",
@@ -78,7 +90,14 @@ actual_price_tab <- tabItem(
     tabPanel(
       "Preço diário",
       DT::dataTableOutput("tbl_1",width = '1000px')
-   ))) ,
+   ))) 
+
+  )
+
+
+# analises_tab ####################
+ analises_tab <- tabItem(
+  tabName = "analises_tab",
   fluidRow(
     box(
       title = "Tabela com medidas de escala e dispersão", 
@@ -144,7 +163,7 @@ actual_price_tab <- tabItem(
       solidHeader = TRUE, 
       collapsible = TRUE,
       plotly::plotlyOutput("plot_acf")
-      ),
+    ),
     box(
       title = "Grafico STL", 
       width = 12,
@@ -155,44 +174,13 @@ actual_price_tab <- tabItem(
       collapsible = TRUE,
       plotly::plotlyOutput("plot_stl")
     )
-  )
-)
 
-# forcast_tab ####################
- forcast_tab <- tabItem(
-  tabName = "cardsAPI",
-  actionButton(inputId = "triggerCard", label = "Trigger Card Action"),
-  actionButton("update_box", "Update box"),
-  selectInput(
-    inputId = "cardAction", 
-    label = "Card action", 
-    choices = c(
-      "toggle",
-      "toggleMaximize",
-      "restore"
-    )
-  ),
-  
-  box(
-    id = "mycard",
-    title = "The plot is visible when you maximize the card", 
-    closable = TRUE, 
-    maximizable = TRUE,
-    width = 12,
-    status = "warning", 
-    solidHeader = FALSE, 
-    collapsible = TRUE,
-    sliderInput("obsAPI", "Number of observations:",
-                min = 0, max = 1000, value = 500
-    ),
-    plotOutput("cardAPIPlot")
-  )
-)
+))
 
 
 # forcast_model_tab ---- #########################
 forcast_model_tab <- tabItem(
-  tabName = "socialcards",
+  tabName = "forecast_tab",
   fluidRow(
     userBox(
       title = userDescription(
@@ -346,7 +334,7 @@ forcast_model_tab <- tabItem(
 
 # theory_tab ---- 
 theory_tab <- tabItem(
-  tabName = "tabcards",
+  tabName = "theory_tab",
   fluidRow(
     column(
       width = 6,
@@ -587,35 +575,36 @@ shinyApp(
         sidebarHeader("Tabelas"),
         menuItem(
           "Tabela de Preço Atual",
-          tabName = "cards",
+          tabName = "tab_prices",
           icon = icon("sliders")
         ),
         menuItem(
-          "Tabela de Preço Previsão",
+          "Análise de dados",
           badgeLabel = "New",
           badgeColor = "success",
-          tabName = "cardsAPI",
+          tabName = "analises_tab",
           icon = icon("th")
         ),
         
         sidebarHeader("Modelos"),
         menuItem(
           "Modelos de Previsão",
-          tabName = "socialcards",
+          tabName = "forecast_tab",
           icon = icon("dashboard")
         ),
         menuItem(
           "Teoria dos Modelos",
-          tabName = "tabcards",
+          tabName = "theory_tab",
           icon = icon("layer-group")
           )
         )
       ),
         
     body = dashboardBody(
+      use_theme(mytheme),
       tabItems(
         actual_price_tab,
-        forcast_tab,
+        analises_tab,
         forcast_model_tab,
         theory_tab
       )
@@ -737,17 +726,6 @@ shinyApp(
       )
     })
     
-    # tooltips, popovers ------------------------------------------------------
-    
-    # observe({
-    #  addTooltip(
-    #    id = "controlbarToggle",
-    #    options = list(
-    #      title = "This toggles the right sidebar",
-    #      placement = "bottom"
-    #    )
-    #  )
-    # })
     
     # plots -------------------------------------------------------------------
     
@@ -787,7 +765,7 @@ shinyApp(
                     ymax = ~recomposed_l2,
                     line = list(color = "rgba(105, 172, 135 ,0.5)"),
                     fillcolor = "rgba(105, 172, 135, 0.3)",
-                    name = "95% Intervalo de confiança") %>% 
+                    name = "Fator IQR") %>% 
         add_markers(x = ~date,
                     y = ~observed,
                     marker = list(color = "#ff0000"),
