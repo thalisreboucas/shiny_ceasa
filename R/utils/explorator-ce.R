@@ -146,4 +146,41 @@ dt %>% plot_ly(
                         Q3 = stats::quantile(value,probs = 0.75, na.rm = TRUE),
                         Maxímo = max(value),
                         Amplitude = (max(value) -min(value))) %>% knitr::kable()
+    
+    
+  ########################### acf #################  
+    data %>%
+      dplyr::group_by(id) %>%
+    dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value)
+    
+    ##################################################
+    data %>%
+      dplyr::group_by(id) %>%
+      dplyr::filter(id == 1) %>% tk_stl_diagnostics(.date_var = date,.value = value) %>% view()
+    
+    ######################################################
+    
+    data %>%
+      dplyr::group_by(id) %>%
+      dplyr::filter(id == 1) %>% tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+      plot_ly(
+        y = ~.value,
+        x= ~month.lbl,
+        type = 'violin',
+        color = I("rgba(105, 172, 135 ,0.8)"),
+        box = list(
+          visible = T
+        ),
+        meanline = list(
+          visible = T
+        )
+      ) %>% 
+      layout(showlegend = F,
+             title=' ',
+             yaxis = list(title = "Preço",
+                          tickprefix = "R$",
+                          gridcolor = 'ffff'),
+             xaxis = list(title = " "))
+    # wday.lbl,week,quarter,month.lbl,year
 
+   

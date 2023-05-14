@@ -180,7 +180,7 @@ actual_price_tab <- tabItem(
       solidHeader = TRUE,
       collapsible = TRUE,
       type = "tabs",
-      selected = "Preço diário",
+      selected = "Gráfico de Tendência",
       tabPanel("Gráfico de Tendência",plotly::plotlyOutput("plot_eda")),
       tabPanel("Grafico de Anomalia",plotly::plotlyOutput("plot_an"))
       
