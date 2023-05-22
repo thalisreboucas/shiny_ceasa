@@ -194,13 +194,6 @@ data %>% filter(id ==1 )%>%
              xaxis = list(title = " "))
     # wday.lbl,week,quarter,month.lbl,year
 
-    
-    ######## acf diag
-data %>% filter(id ==1) %>% tk_acf_diagnostics(
-      date, value,               # ACF & PACF
-      .lags = 15,          # 7-Days of hourly lags
-    )
-
 
 
    
