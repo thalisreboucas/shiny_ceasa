@@ -75,7 +75,7 @@ dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>
               ymax = ~recomposed_l2,
               line = list(color = "rgba(105, 172, 135 ,0.5)"),
               fillcolor = "rgba(105, 172, 135, 0.3)",
-              name = "95% Intervalo de confiança") %>% 
+              name = "Fator Iqr") %>% 
    add_markers(x = ~date,
                y = ~observed,
                marker = list(color = "#ff0000"),
@@ -94,7 +94,8 @@ dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>
 
 
 ### box plot
-dt %>% plot_ly(
+data %>% filter(id ==1 )%>% 
+  plot_ly(
   y = ~value,
   type = 'violin',
   color = I("rgba(105, 172, 135 ,0.8)"),
@@ -154,15 +155,25 @@ dt %>% plot_ly(
     dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value)
     
     ##################################################
+    
+    ################ new_stl diag 
+    
     data %>%
       dplyr::group_by(id) %>%
-      dplyr::filter(id == 1) %>% tk_stl_diagnostics(.date_var = date,.value = value) %>% view()
+      dplyr::filter(id == 1) %>% tk_stl_diagnostics(.date_var = date,.value = value) %>% 
+      plot_ly() %>%
+      add_lines(x = ~date,
+                y = ~remainder,
+                line = list(color = "rgb(105, 175, 94)"),
+                name = "Dados")
     
+    ## observed ,season , trend , remainder , seasadj
     ######################################################
-    
+   ##### new box plot  
     data %>%
       dplyr::group_by(id) %>%
       dplyr::filter(id == 1) %>% tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+      dplyr::filter(year == 2022) %>% 
       plot_ly(
         y = ~.value,
         x= ~month.lbl,
@@ -182,5 +193,14 @@ dt %>% plot_ly(
                           gridcolor = 'ffff'),
              xaxis = list(title = " "))
     # wday.lbl,week,quarter,month.lbl,year
+
+    
+    ######## acf diag
+data %>% filter(id ==1) %>% tk_acf_diagnostics(
+      date, value,               # ACF & PACF
+      .lags = 15,          # 7-Days of hourly lags
+    )
+
+
 
    
