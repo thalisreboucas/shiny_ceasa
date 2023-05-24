@@ -163,13 +163,27 @@ actual_price_tab <- tabItem(
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
-      width = 10,
+      width = 8,
       solidHeader = TRUE, 
       status = "primary",
       collapsible = TRUE,
-      plotly::plotlyOutput("plot_violin")
-    )
-  ),
+      plotly::plotlyOutput("plot_violin")),
+    box(
+      width = 4,
+      radioButtons(
+      inputId = "year_violin",
+      label = "Escolha o ano:",
+      choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
+      selected = 2023),
+      radioButtons(
+        inputId = "model_violin",
+        label = "Como você quer agrupar :",
+        choices = list("Dia da semana " = wday.lbl,
+                       "Semana" = week,
+                       "Mês" =  month.lbl,
+                       "Ano" = year ),
+        selected = year)
+  )),
   fluidRow(
     tabBox(
       title = "Gráfico de Serie temporal", 
@@ -658,6 +672,8 @@ shinyApp(
   server = function(input, output, session) {
     useAutoColor(T)
     item <- reactive(as.numeric({input$item}))
+    year_violin <- reactive(as.numeric({input$year_violin}))
+    model_violin <- reactive({input$model_violin})
     # alerts ------------------------------------------------------------------
     observeEvent(input$show_alert, {
       print("created")
@@ -769,8 +785,11 @@ shinyApp(
       data %>%
         dplyr::group_by(id) %>%
         dplyr::filter(id == item()) %>% 
+        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+        dplyr::filter(year == year_violin()) %>% 
         plot_ly(
-          y = ~value,
+          y = ~.value,
+          x= ~model_violin(),
           type = 'violin',
           color = I("rgba(105, 172, 135 ,0.8)"),
           box = list(
@@ -778,15 +797,14 @@ shinyApp(
           ),
           meanline = list(
             visible = T
-          ),
-          x0 = ' '
+          )
         ) %>% 
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
                             tickprefix = "R$",
-                            gridcolor = 'ffff'))
-      
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
     })
     
     
