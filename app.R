@@ -174,15 +174,7 @@ actual_price_tab <- tabItem(
       inputId = "year_violin",
       label = "Escolha o ano:",
       choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
-      selected = 2023),
-      radioButtons(
-        inputId = "model_violin",
-        label = "Como você quer agrupar :",
-        choices = list("Dia da semana " = wday.lbl,
-                       "Semana" = week,
-                       "Mês" =  month.lbl,
-                       "Ano" = year ),
-        selected = year)
+      selected = 2023)
   )),
   fluidRow(
     tabBox(
@@ -673,7 +665,6 @@ shinyApp(
     useAutoColor(T)
     item <- reactive(as.numeric({input$item}))
     year_violin <- reactive(as.numeric({input$year_violin}))
-    model_violin <- reactive({input$model_violin})
     # alerts ------------------------------------------------------------------
     observeEvent(input$show_alert, {
       print("created")
@@ -789,7 +780,7 @@ shinyApp(
         dplyr::filter(year == year_violin()) %>% 
         plot_ly(
           y = ~.value,
-          x= ~model_violin(),
+          x= ~year,
           type = 'violin',
           color = I("rgba(105, 172, 135 ,0.8)"),
           box = list(

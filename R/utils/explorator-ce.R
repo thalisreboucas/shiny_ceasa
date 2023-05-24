@@ -174,9 +174,9 @@ data %>% filter(id ==1 )%>%
       dplyr::group_by(id) %>%
       dplyr::filter(id == 1) %>% tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
       dplyr::filter(year == 2022)  %>% 
-      plotly::plot_ly(
+        plotly::plot_ly(
         y = ~.value,
-        x= ~week,
+        x = ~ ,
         type = 'violin',
         color = I("rgba(105, 172, 135 ,0.8)"),
         box = list(
