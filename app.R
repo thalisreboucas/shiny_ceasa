@@ -61,6 +61,19 @@ mytheme <- create_theme(
 actual_price_tab <- tabItem(
   tabName = "tab_prices",
   fluidRow(
+    box(width = 4,
+        status = "primary",
+        title = "Filtro de data para os itens",
+        solidHeader = TRUE, 
+    dateRangeInput('dateRange',
+                   label = '',
+                   language = "portuguese",
+                   min = min(data$date),
+                   max = max(data$date),
+                   start = max(data$date) , 
+                   end =  "2023-01-01 UTC" ,
+                   format = "dd/mm/yyyy" ,
+                   separator = "Até" )),
     tabBox(
       title = "Tabela de Preços da Ceasa", 
       closable = FALSE, 
@@ -70,19 +83,6 @@ actual_price_tab <- tabItem(
       collapsible = FALSE,
       type = "tabs",
       selected = "Preço diário",
-      sidebar = boxSidebar(
-        startOpen = FALSE,
-        id = "mycardsidebar",
-        background = "#ffffff",
-        dateRangeInput('dateRange',
-                       label = 'Filtro de dados para os itens',
-                       language = "portuguese",
-                       min = min(data$date),
-                       max = max(data$date),
-                       start = max(data$date) , 
-                       end =  "2023-01-01 UTC" ,
-                       format = "dd/mm/yyyy" ,
-                       separator = "Até" )),
       tabPanel(
         "Média Mensal",
       DT::dataTableOutput("tbl",width = '1200px')
@@ -150,6 +150,14 @@ actual_price_tab <- tabItem(
         "UVA ITALIA"=45,
         "UVA NIAGARA"=46,
         "VAGEM"=47)),
+    selectInput(
+      multiple = TRUE,
+      inputId = "year_violin",
+      label = "Escolha o ano:",
+      choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
+      selected = 2023)
+    
+    ,
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
@@ -176,18 +184,7 @@ actual_price_tab <- tabItem(
       tabPanel("Quarto de ano",plotly::plotlyOutput("plot_violin_quarter"))
       )
     
-    
-    ,
-    box(
-      width = 2,
-      solidHeader = TRUE, 
-      selectInput(
-      multiple = TRUE,
-      inputId = "year_violin",
-      label = "Escolha o ano:",
-      choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
-      selected = 2023)
-  )),
+   ),
   fluidRow(
     tabBox(
       title = "Gráfico de Serie temporal", 
@@ -961,7 +958,7 @@ shinyApp(
      tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
                         values_from = value)    %>%  
      DT::datatable(filter = 'top', options = list(
-       pageLength = 10, autoWidth = TRUE,scrollX = TRUE))
+       pageLength = 11, autoWidth = TRUE,scrollX = TRUE))
    })
    
     # card API ----------------------------------------------------------------
