@@ -80,7 +80,7 @@ actual_price_tab <- tabItem(
                        min = min(data$date),
                        max = max(data$date),
                        start = max(data$date) , 
-                       end = min(data$date) ,
+                       end =  "2023-01-01 UTC" ,
                        format = "dd/mm/yyyy" ,
                        separator = "Até" )),
       tabPanel(
@@ -160,17 +160,29 @@ actual_price_tab <- tabItem(
       tableOutput("tbl_eda_1")
     ),
     
-    box(
-      title = "Tabela com medidas de escala e dispersão", 
+    tabBox(
+      title = "Gráfico da distribuição de preços (Boxplot)", 
       closable = FALSE, 
-      width = 8,
+      width = 10,
       solidHeader = TRUE, 
       status = "primary",
       collapsible = TRUE,
-      plotly::plotlyOutput("plot_violin")),
+      type = "tabs",
+      selected = "Ano",
+      tabPanel("Ano",plotly::plotlyOutput("plot_violin")),
+      tabPanel("Mês",plotly::plotlyOutput("plot_violin_month")),
+      tabPanel("Dia da Semana",plotly::plotlyOutput("plot_violin_week")),
+      tabPanel("Semanas",plotly::plotlyOutput("plot_violin_weeks")),
+      tabPanel("Quarto de ano",plotly::plotlyOutput("plot_violin_quarter"))
+      )
+    
+    
+    ,
     box(
-      width = 4,
-      radioButtons(
+      width = 2,
+      solidHeader = TRUE, 
+      selectInput(
+      multiple = TRUE,
       inputId = "year_violin",
       label = "Escolha o ano:",
       choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
@@ -194,16 +206,6 @@ actual_price_tab <- tabItem(
   ),
   
   fluidRow(
-    box(
-      title = "Grafico S-diag", 
-      width = 12,
-      status = "primary", 
-      closable = FALSE,
-      maximizable = TRUE, 
-      solidHeader = TRUE, 
-      collapsible = TRUE,
-      plotly::plotlyOutput("plot_sd")
-    ),
     box(
       title = "Grafico ACF", 
       width = 12,
@@ -763,13 +765,6 @@ shinyApp(
       
     })
 
-    output$plot_sd <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        plot_seasonal_diagnostics(date, value, .interactive = T)
-    })
-    
     
     
     output$plot_violin <-  plotly::renderPlotly({
@@ -798,7 +793,110 @@ shinyApp(
                xaxis = list(title = " "))
     })
     
+    output$plot_violin_month <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+        dplyr::filter(year == year_violin()) %>% 
+        plot_ly(
+          y = ~.value,
+          x= ~month.lbl,
+          type = 'violin',
+          color = I("rgba(105, 172, 135 ,0.8)"),
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          )
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
+    })
     
+    output$plot_violin_week <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+        dplyr::filter(year == year_violin()) %>% 
+        plot_ly(
+          y = ~.value,
+          x= ~wday.lbl,
+          type = 'violin',
+          color = I("rgba(105, 172, 135 ,0.8)"),
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          )
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
+    })
+    
+    output$plot_violin_weeks <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+        dplyr::filter(year == year_violin()) %>% 
+        plot_ly(
+          y = ~.value,
+          x= ~week,
+          type = 'violin',
+          color = I("rgba(105, 172, 135 ,0.8)"),
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          )
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
+    })
+    
+    
+    output$plot_violin_quarter <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+        dplyr::filter(year == year_violin()) %>% 
+        plot_ly(
+          y = ~.value,
+          x= ~quarter,
+          type = 'violin',
+          color = I("rgba(105, 172, 135 ,0.8)"),
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          )
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
+    })
     
     output$plot_stl <-  plotly::renderPlotly({
       data %>%
@@ -840,16 +938,19 @@ shinyApp(
     
     output$tbl_eda_1 <- renderTable({ data %>%
                                        dplyr::group_by(id) %>%
-                                       dplyr::filter(id == item()) %>%  dplyr::summarize( Mínimo = min(value),
-                                                                                          Média = mean(value),`Desvio Padrão` = sd(value) , 
-                                                                                          IQR = IQR(value) , 
-                                                                                          Curtose = as.numeric(kurtosis(value)) , 
-                                                                                          Assimetria = as.numeric(skewness(value)),
-                                                                                          Q1 = stats::quantile(value,probs = 0.25, na.rm = TRUE), 
-                                                                                          Mediana = median(value),
-                                                                                          Q3 = stats::quantile(value,probs = 0.75, na.rm = TRUE),
-                                                                                          Maxímo = max(value),
-                                                                                          Amplitude = (max(value) -min(value))) 
+                                       dplyr::filter(id == item()) %>% 
+                                       timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
+                                       dplyr::filter(year == year_violin()) %>% 
+                                       dplyr::summarize( Mínimo = min(.value),
+                                                                                          Média = mean(.value),`Desvio Padrão` = sd(.value) , 
+                                                                                          IQR = IQR(.value) , 
+                                                                                          Curtose = as.numeric(kurtosis(.value)) , 
+                                                                                          Assimetria = as.numeric(skewness(.value)),
+                                                                                          Q1 = stats::quantile(.value,probs = 0.25, na.rm = TRUE), 
+                                                                                          Mediana = median(.value),
+                                                                                          Q3 = stats::quantile(.value,probs = 0.75, na.rm = TRUE),
+                                                                                          Maxímo = max(.value),
+                                                                                          Amplitude = (max(.value) -min(.value))) 
                                      
     })
     

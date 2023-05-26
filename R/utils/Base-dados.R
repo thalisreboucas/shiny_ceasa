@@ -5,8 +5,6 @@ Dados_Ceasa_Preco <- readxl::read_excel("E:/edime/Thalis/MEU/Ceasa/shiny_ceasa/R
 
 data <- Dados_Ceasa_Preco  %>% dplyr::select(id,Produto,date,value) %>% drop_na()
 
-tk_seasonal <- data %>% timetk::tk_seasonal_diagnostics(.date_var = date ,.value = value) 
-
 remove(Dados_Ceasa_Preco)
 
 
