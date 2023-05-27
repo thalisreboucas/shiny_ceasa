@@ -152,7 +152,44 @@ data %>% filter(id ==1 )%>%
   ########################### acf #################  
     data %>%
       dplyr::group_by(id) %>%
-    dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value)
+    dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value) %>% 
+    plot_ly() %>%
+      add_lines(x = ~lag,
+                y = ~ACF,
+                line = list(color = "rgb(105, 175, 94)"),
+                name = "Correlação ACF") %>%
+      add_ribbons(x = ~lag,
+                  ymin = ~.white_noise_lower,
+                  ymax = ~.white_noise_upper,
+                  line = list(color = "rgba(105, 172, 135 ,0.5)"),
+                  fillcolor = "rgba(105, 172, 135, 0.3)",
+                  name = "Ruído Branco") %>% 
+      layout(
+      yaxis = list(name = "Correlação ACF" ))
+    
+    data %>%
+      dplyr::group_by(id) %>%
+      dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value) %>% 
+      plot_ly() %>%
+      add_lines(x = ~lag,
+                y = ~PACF,
+                line = list(color = "rgb(105, 175, 94)",size = 2),
+                name = "Correlação PACF") %>%
+      add_markers(x = ~lag,
+                  y = ~PACF,
+                  marker = list(color = "rgb(105, 175, 94)",size = 2)) %>% 
+      add_ribbons(x = ~lag,
+                  ymin = ~.white_noise_lower,
+                  ymax = ~.white_noise_upper,
+                  line = list(color = "rgba(105, 172, 135 ,0.5)"),
+                  fillcolor = "rgba(105, 172, 135, 0.3)",
+                  name = "Ruído Branco") 
+    
+    
+    
+    data %>%
+      dplyr::group_by(id) %>%
+      dplyr::filter(id == 1) %>% plot_acf_diagnostics(.date_var = date,.value = value)
     
     ##################################################
     
@@ -163,7 +200,7 @@ data %>% filter(id ==1 )%>%
       dplyr::filter(id == 1) %>% tk_stl_diagnostics(.date_var = date,.value = value) %>% 
       plot_ly() %>%
       add_lines(x = ~date,
-                y = ~remainder,
+                y = ~season,
                 line = list(color = "rgb(105, 175, 94)"),
                 name = "Dados")
     
@@ -195,5 +232,8 @@ data %>% filter(id ==1 )%>%
     # wday.lbl,week,quarter,month.lbl,year
 
 
+      data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
+        dplyr::mutate(Produto = paste(produte,unit)) %>% 
+        dplyr::group_by(my,Produto) %>% View()
 
    

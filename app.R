@@ -922,12 +922,14 @@ shinyApp(
     output$tbl <- DT::renderDataTable({
       data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
         dplyr::filter( date >= input$dateRange[2] &  date <= input$dateRange[1] ) %>% 
+        dplyr::mutate(Produto = paste(produte,unit,sep = " ")) %>% 
         dplyr::group_by(my,Produto) %>% 
           dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>%
           dplyr::arrange(desc(my)) %>% 
             tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
                            values_from = value)    %>%  
                              DT::datatable(filter = 'top', options = list(
+                               language = pt,
                               pageLength = 10, autoWidth = TRUE,scrollX = TRUE)) 
       })
     
@@ -952,12 +954,14 @@ shinyApp(
     })
     
    output$tbl_1 <- DT::renderDataTable({
-   data %>% dplyr::group_by(Produto) %>% 
+   data %>% dplyr::group_by(produte) %>% 
      dplyr::filter(date >= input$dateRange[2] & date <= input$dateRange[1] ) %>% 
+      dplyr::mutate(Produto = paste(produte,unit,sep = " ")) %>% 
    dplyr::arrange(desc(date)) %>%  
      tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
                         values_from = value)    %>%  
      DT::datatable(filter = 'top', options = list(
+       language = pt,
        pageLength = 11, autoWidth = TRUE,scrollX = TRUE))
    })
    
