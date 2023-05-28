@@ -150,40 +150,50 @@ data %>% filter(id ==1 )%>%
     
     
   ########################### acf #################  
-    data %>%
-      dplyr::group_by(id) %>%
+  data %>%
+    dplyr::group_by(id) %>%
     dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value) %>% 
     plot_ly() %>%
       add_lines(x = ~lag,
                 y = ~ACF,
                 line = list(color = "rgb(105, 175, 94)"),
                 name = "Correlação ACF") %>%
-      add_ribbons(x = ~lag,
-                  ymin = ~.white_noise_lower,
-                  ymax = ~.white_noise_upper,
-                  line = list(color = "rgba(105, 172, 135 ,0.5)"),
-                  fillcolor = "rgba(105, 172, 135, 0.3)",
-                  name = "Ruído Branco") %>% 
+      add_lines(y = ~.white_noise_lower,
+                x = ~lag,
+                line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
+                name = "Ruído Branco inferior ") %>%
+      add_lines(y = ~.white_noise_upper,
+                x = ~lag,
+                  line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
+                  name = "Ruído Branco superior") %>% 
       layout(
-      yaxis = list(name = "Correlação ACF" ))
+      yaxis = list(title = "Correlação ACF" ),
+       xaxis = list(title = "Quantidade de Lags"))
     
     data %>%
       dplyr::group_by(id) %>%
-      dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value) %>% 
+      dplyr::filter(id == 1) %>% tk_acf_diagnostics(.date_var = date,.value = value,) %>% 
       plot_ly() %>%
       add_lines(x = ~lag,
                 y = ~PACF,
-                line = list(color = "rgb(105, 175, 94)",size = 2),
-                name = "Correlação PACF") %>%
+                line = list(color = "rgb(105, 175, 94)"),
+                name = "Correlação ACF") %>%
       add_markers(x = ~lag,
                   y = ~PACF,
-                  marker = list(color = "rgb(105, 175, 94)",size = 2)) %>% 
-      add_ribbons(x = ~lag,
-                  ymin = ~.white_noise_lower,
-                  ymax = ~.white_noise_upper,
-                  line = list(color = "rgba(105, 172, 135 ,0.5)"),
-                  fillcolor = "rgba(105, 172, 135, 0.3)",
-                  name = "Ruído Branco") 
+                  marker = list(color = "rgb(105, 175, 94)",
+                                size = 4),
+                  name = "Pontos da Correlação ACF") %>% 
+      add_lines(y = ~.white_noise_lower,
+                x = ~lag,
+                line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
+                name = "Ruído Branco inferior ") %>%
+      add_lines(y = ~.white_noise_upper,
+                x = ~lag,
+                line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
+                name = "Ruído Branco superior") %>% 
+      layout(
+        yaxis = list(title = "Correlação ACF" ),
+        xaxis = list(title = "Quantidade de Lags"))
     
     
     

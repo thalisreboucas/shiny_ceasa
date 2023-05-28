@@ -99,6 +99,13 @@ actual_price_tab <- tabItem(
  analises_tab <- tabItem(
   tabName = "analises_tab",
   fluidRow(
+    
+    box(
+      closable = FALSE, 
+      width = 3,
+      solidHeader = TRUE, 
+      status = "primary",
+      collapsible = TRUE,
     selectInput(
       inputId = "item",
       label = "Escolha o item:",
@@ -156,12 +163,12 @@ actual_price_tab <- tabItem(
       label = "Escolha o ano:",
       choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
       selected = 2023)
-    
+    )
     ,
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
-      width = 12,
+      width = 9,
       solidHeader = TRUE, 
       status = "primary",
       collapsible = TRUE,
@@ -203,15 +210,18 @@ actual_price_tab <- tabItem(
   ),
   
   fluidRow(
-    box(
-      title = "Grafico ACF", 
+   tabBox(
+      title = "Grafico de diagnósticos de Lags", 
       width = 12,
       status = "primary", 
       closable = FALSE,
       maximizable = TRUE, 
       solidHeader = TRUE, 
       collapsible = TRUE,
-      plotly::plotlyOutput("plot_acf")
+      type = "tabs",
+      selected = "Gráfico de Correlação ACF",
+      tabPanel("Gráfico de Correlação ACF", plotly::plotlyOutput("plot_acf")),
+      tabPanel("Gráfico de Correlação PACF", plotly::plotlyOutput("plot_pacf"))
     ),
     box(
       title = "Grafico STL", 
@@ -388,7 +398,7 @@ theory_tab <- tabItem(
     column(
       width = 6,
       tabBox(
-        title = "A card with tabs",
+        title = "Modelos Utilizados",
         elevation = 2,
         id = "tabcard1",
         width = 12,
@@ -397,159 +407,48 @@ theory_tab <- tabItem(
         type = "tabs",
         status = "primary",
         solidHeader = TRUE,
-        selected = "Tab 2",
+        selected = "Prophet",
         tabPanel(
-          "Tab 1",
-          "A wonderful serenity has taken possession of my entire soul,
-          like these sweet mornings of spring which I enjoy with my
-          whole heart. I am alone, and feel the charm of existence in
-          this spot, which was created for the bliss of souls like mine.
-          I am so happy, my dear friend, so absorbed in the exquisite sense
-          of mere tranquil existence, that I neglect my talents. I should be
-          incapable of drawing a single stroke at the present moment; and yet
-          I feel that I never was a greater artist than now"
+          "Prophet",
+          "O modelo Prophet é um modelo de séries temporais desenvolvido pelo Facebook, projetado para fazer previsões de séries temporais com tendência não linear, sazonalidade e feriados. Ele é baseado em uma abordagem de decomposição aditiva, onde a série temporal é dividida em três componentes principais: tendência, sazonalidade e feriados. O modelo Prophet usa uma regressão não linear para modelar a tendência e um modelo de regressão aditiva para modelar sazonalidade e feriados. Ele utiliza técnicas de aprendizado de máquina para selecionar automaticamente os melhores parâmetros para o modelo.
+
+O modelo Prophet é especialmente útil para previsões de curto e médio prazo de séries temporais que contêm sazonalidade e efeitos de feriados. Ele requer pouca ou nenhuma intervenção manual para ajuste de parâmetros e pode lidar com lacunas na série temporal. Além disso, ele fornece intervalos de incerteza para as previsões, o que significa que é possível avaliar o grau de confiança das previsões.
+
+Este modelo é popular na indústria devido à sua facilidade de implementação e desempenho sólido em uma ampla gama de aplicações, desde previsões de vendas até previsões de produção e demanda de energia. No entanto, ele não é recomendado para séries temporais extremamente curtas ou irregularmente espaçadas. 
+Fonte :ChatGPT"),
+        tabPanel(
+          "XGBoost",
+          "O XGBoost é um modelo de aprendizado de máquina muito popular que usa a técnica de boosting para produzir modelos altamente precisos e escaláveis. O modelo é muito útil para previsão de séries temporais, pois é capaz de lidar com dados não lineares e com diferentes escalas de tempo.
+
+Existem algumas considerações importantes ao utilizar o XGBoost na previsão de séries temporais, como a escolha das variáveis usadas para treinar o modelo e a definição correta dos parâmetros de configuração. Aqui estão alguns passos importantes e recomendações para a construção de um modelo XGBoost para previsão de séries temporais:
+
+Preparação dos dados: antes de treinar o modelo, é importante preparar os dados da série temporal. Isso pode incluir a limpeza de dados ausentes ou inconsistentes, a normalização de dados e a agregação de séries temporais em janelas de tempo.
+
+Escolha de variáveis: para prever uma série temporal, é importante escolher as variáveis que podem afetar o resultado. Isso pode incluir variáveis históricas, variáveis ​​externas (por exemplo, dados meteorológicos ou econômicos) e variáveis ​​sazonais.
+
+Configuração de parâmetros: o XGBoost tem muitos parâmetros de configuração que podem afetar a precisão do modelo. Isso inclui parâmetros de regularização, parâmetros de aprendizado e parâmetros relacionados ao número de árvores a serem usadas no modelo.
+
+Treinamento do modelo: depois de preparar os dados e escolher as variáveis, é hora de treinar o modelo. Um método comum para treinar um modelo XGBoost para séries temporais é usar o recurso rolling forecast, onde o modelo é atualizado a cada nova observação de dados.
+
+Avaliação do modelo: finalmente, é importante avaliar o modelo para verificar sua precisão e detectar possíveis problemas. Isso pode incluir a comparação dos resultados previstos com os resultados observados e o uso de técnicas de validação cruzada para testar a robustez do modelo.
+
+Em geral, o modelo XGBoost pode ser uma ferramenta muito poderosa para previsão de séries temporais. No entanto, é importante ter em mente que a construção de um modelo preciso requer um processo cuidadoso de seleção de variáveis, configuração de parâmetros e treinamento do modelo."
         ),
         tabPanel(
-          "Tab 2",
-          "The European languages are members of the same family.
-          Their separate existence is a myth. For science, music,
-          sport, etc, Europe uses the same vocabulary. The languages
-          only differ in their grammar, their pronunciation and their
-          most common words. Everyone realizes why a new common
-          language would be desirable: one could refuse to pay expensive
-          translators. To achieve this, it would be necessary to have
-          uniform grammar, pronunciation and more common words. If several
-          languages coalesce, the grammar of the resulting language is
-          more simple and regular than that of the individual languages."
-        ),
-        tabPanel(
-          "Tab 3",
-          "Lorem Ipsum is simply dummy text of the printing and
-          typesetting industry. Lorem Ipsum has been the industry's
-          standard dummy text ever since the 1500s, when an unknown
-          printer took a galley of type and scrambled it to make a
-          type specimen book. It has survived not only five centuries,
-          but also the leap into electronic typesetting, remaining
-          essentially unchanged. It was popularised in the 1960s with
-          the release of Letraset sheets containing Lorem Ipsum passages,
-          and more recently with desktop publishing software like Aldus
-          PageMaker including versions of Lorem Ipsum."
-        )
-      )
-    ),
-    column(
-      width = 6,
-      actionButton("update_tabBox2", "Toggle maximize tabBox", class = "my-2"),
-      tabBox(
-        title = "Tabs on right!",
-        side = "right",
-        id = "tabcard2",
-        type = "tabs",
-        elevation = 2,
-        width = 12,
-        status = "warning",
-        maximizable = TRUE,
-        collapsible = TRUE, 
-        closable = TRUE,
-        selected = "Tab 6",
-        tabPanel(
-          "Tab 4",
-          "A wonderful serenity has taken possession of my entire soul,
-          like these sweet mornings of spring which I enjoy with my
-          whole heart. I am alone, and feel the charm of existence in
-          this spot, which was created for the bliss of souls like mine.
-          I am so happy, my dear friend, so absorbed in the exquisite sense
-          of mere tranquil existence, that I neglect my talents. I should be
-          incapable of drawing a single stroke at the present moment; and yet
-          I feel that I never was a greater artist than now"
-        ),
-        tabPanel(
-          "Tab 5",
-          "The European languages are members of the same family.
-          Their separate existence is a myth. For science, music,
-          sport, etc, Europe uses the same vocabulary. The languages
-          only differ in their grammar, their pronunciation and their
-          most common words. Everyone realizes why a new common
-          language would be desirable: one could refuse to pay expensive
-          translators. To achieve this, it would be necessary to have
-          uniform grammar, pronunciation and more common words. If several
-          languages coalesce, the grammar of the resulting language is
-          more simple and regular than that of the individual languages."
-        ),
-        tabPanel(
-          "Tab 6",
-          "Lorem Ipsum is simply dummy text of the printing and
-          typesetting industry. Lorem Ipsum has been the industry's
-          standard dummy text ever since the 1500s, when an unknown
-          printer took a galley of type and scrambled it to make a
-          type specimen book. It has survived not only five centuries,
-          but also the leap into electronic typesetting, remaining
-          essentially unchanged. It was popularised in the 1960s with
-          the release of Letraset sheets containing Lorem Ipsum passages,
-          and more recently with desktop publishing software like Aldus
-          PageMaker including versions of Lorem Ipsum."
+          "Arima",
+          "O modelo ARIMA (Autoregressive Integrated Moving Average) é uma técnica de análise de séries temporais que combina a regressão linear com a análise de resíduos. Ele é utilizado para modelar e prever valores futuros de séries temporais, levando em conta o comportamento passado e presente da série.
+
+O modelo ARIMA é composto por três componentes principais: o componente autoregressivo (AR), o componente de média móvel (MA) e o componente de diferenciação (I).
+
+O componente AR é responsável por modelar o comportamento de autocorrelação na série temporal. Ele utiliza valores passados da série para prever valores futuros. O componente MA é responsável por modelar o comportamento de médias móveis na série temporal. Ele utiliza os erros passados da previsão da série para prever valores futuros.
+
+O componente I é responsável por diferenciar a série temporal para torná-la estacionária. Caso a série não seja estacionária, a diferenciação é necessária para eliminar tendências e variações sazonais na série.
+
+O modelo ARIMA utiliza técnicas estatísticas para determinar os parâmetros ótimos para cada componente, com o objetivo de minimizar o erro geral do modelo. O modelo é então utilizado para prever valores futuros da série temporal."
         )
       )
     )
-  ),
-  br(), br(),
-  fluidRow(
-    # manually inserted panels
-    column(
-      width = 6,
-      bs4Dash::tabsetPanel(
-        id = "tabsetpanel1",
-        selected = "Tab 2",
-        tabPanel(
-          "Tab 1",
-          "Content 1"
-        ),
-        tabPanel(
-          "Tab 2",
-          "Content 2"
-        ),
-        tabPanel(
-          "Tab 3",
-          "Content 3"
-        )
-      )
-    ),
-    
-    # programmatically inserted panels
-    column(
-      width = 6,
-      bs4Dash::tabsetPanel(
-        id = "tabsetpanel2",
-        type = "pills",
-        .list = lapply(1:3, function(i) {
-          tabPanel(
-            paste0("Tab", i),
-            paste("Content", i)
-          )
-        })
-      )
-    )
-  ),
-  br(), br(),
-  # Vertical panels: TO DO
-  tabsetPanel(
-    id = "tabsetpanel3",
-    selected = "Tab 2",
-    vertical = TRUE,
-    tabPanel(
-      "Tab 1",
-      "Content 1"
-    ),
-    tabPanel(
-      "Tab 2",
-      "Content 2"
-    ),
-    tabPanel(
-      "Tab 3",
-      "Content 3"
-    )
-  )
-)
+))
 
 
 ########################################
@@ -909,11 +808,54 @@ shinyApp(
       data %>%
         dplyr::group_by(id) %>%
         dplyr::filter(id == item()) %>% 
-        plot_acf_diagnostics(
-          date, value,               # ACF & PACF
-          .lags = "30 days",          # 7-Days of hourly lags
-          .interactive = FALSE
-        )
+        tk_acf_diagnostics(.date_var = date,.value = value) %>% 
+        plot_ly() %>%
+        add_lines(x = ~lag,
+                  y = ~ACF,
+                  line = list(color = "rgb(105, 175, 94)"),
+                  name = "Correlação ACF") %>%
+        add_lines(y = ~.white_noise_lower,
+                  x = ~lag,
+                  line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
+                  name = "Ruído Branco inferior ") %>%
+        add_lines(y = ~.white_noise_upper,
+                  x = ~lag,
+                  line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
+                  name = "Ruído Branco superior") %>% 
+        layout(
+          yaxis = list(title = "Correlação ACF" ),
+          xaxis = list(title = "Quantidade de Lags"))
+        
+    })
+    
+    
+    output$plot_pacf <-  plotly::renderPlotly({
+      data %>%
+        dplyr::group_by(id) %>%
+        dplyr::filter(id == item()) %>% 
+        tk_acf_diagnostics(.date_var = date,.value = value) %>% 
+        plot_ly() %>%
+        add_lines(x = ~lag,
+                  y = ~PACF,
+                  line = list(color = "rgb(105, 175, 94)"),
+                  name = "Correlação PACF") %>%
+        add_markers(x = ~lag,
+                    y = ~PACF,
+                    marker = list(color = "rgb(105, 175, 94)",
+                                  size = 4),
+                    name = "Pontos da Correlação ACF") %>% 
+        add_lines(y = ~.white_noise_lower,
+                  x = ~lag,
+                  line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
+                  name = "Ruído Branco inferior ") %>%
+        add_lines(y = ~.white_noise_upper,
+                  x = ~lag,
+                  line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
+                  name = "Ruído Branco superior") %>% 
+        layout(
+          yaxis = list(title = "Correlação PACF" ),
+          xaxis = list(title = "Quantidade de Lags"))
+      
     })
     
     
