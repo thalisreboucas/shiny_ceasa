@@ -456,7 +456,6 @@ O modelo ARIMA utiliza técnicas estatísticas para determinar os parâmetros ó
 shinyApp(
   ui = dashboardPage(
     preloader = list(html = tagList(spin_1(), "Thalis.R: Carregando"), color = "#F14902"),
-    dark = FALSE,
     help = TRUE,
     scrollToTop = TRUE,
     header = dashboardHeader(
@@ -500,15 +499,16 @@ shinyApp(
       )
     ),
     sidebar = dashboardSidebar(
-      fixed = T,collapsed = T,
-      expandOnHover = F,
+      fixed = T,
+      collapsed = T,
+      expandOnHover = T,
       skin = "light",
       status = "primary",
       id = "sidebar",
       customArea = fluidRow(
       ),
       sidebarUserPanel(
-        image = "https://thalisreboucas.com.br/images/logo.png",
+        image = "logo.png",
         name = "Thalis.R!"
       ),
       sidebarMenu(
