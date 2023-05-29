@@ -47,21 +47,20 @@ EDA <- function(product_id){
 
 ### grafico padrão 
 
-dt %>%  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+data %>%
+ filter(id ==1 ) %>% 
+  tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
   add_lines(x = ~date,
-            y = ~observed,
+            y = ~remainder,
             line = list(color = "rgb(105, 175, 94)"),
             name = "Dados") %>%
-  add_lines(x = ~date , y = ~trend , name ="tendência" ,
-            line = list(color = "rgb(4, 86, 74)")) %>% 
   layout(showlegend = T,
          title='',
          yaxis = list(title = "Preço",
                       tickprefix = "R$",
                       gridcolor = 'ffff'),
-         xaxis = list(title = "Dia",
-                      gridcolor = 'ffff',
-                      rangeslider = list(visible = T)))
+         xaxis = list(title = "Ano",
+                      gridcolor = 'ffff'))
 
 ### grafico  de anomalia 
 
@@ -223,7 +222,7 @@ data %>% filter(id ==1 )%>%
       dplyr::filter(year == 2022)  %>% 
         plotly::plot_ly(
         y = ~.value,
-        x = ~ ,
+        x = ~ week,
         type = 'violin',
         color = I("rgba(105, 172, 135 ,0.8)"),
         box = list(

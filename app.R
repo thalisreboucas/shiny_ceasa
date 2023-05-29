@@ -20,6 +20,7 @@ toastOpts <- list(
   position = "bottomRight"
 )
 
+
 ######### color statuses #######
 statusColors <- c(
   "gray-dark",
@@ -67,7 +68,7 @@ actual_price_tab <- tabItem(
         solidHeader = TRUE, 
     dateRangeInput('dateRange',
                    label = '',
-                   language = "portuguese",
+                   language = "pt",
                    min = min(data$date),
                    max = max(data$date),
                    start = max(data$date) , 
@@ -204,7 +205,8 @@ actual_price_tab <- tabItem(
       type = "tabs",
       selected = "Gráfico de Tendência",
       tabPanel("Gráfico de Tendência",plotly::plotlyOutput("plot_eda")),
-      tabPanel("Grafico de Anomalia",plotly::plotlyOutput("plot_an"))
+      tabPanel("Grafico de Anomalia",plotly::plotlyOutput("plot_an")),
+      tabPanel("Gráfico do Restante",plotly::plotlyOutput("plot_stl"))
       
     )
   ),
@@ -222,18 +224,8 @@ actual_price_tab <- tabItem(
       selected = "Gráfico de Correlação ACF",
       tabPanel("Gráfico de Correlação ACF", plotly::plotlyOutput("plot_acf")),
       tabPanel("Gráfico de Correlação PACF", plotly::plotlyOutput("plot_pacf"))
-    ),
-    box(
-      title = "Grafico STL", 
-      width = 12,
-      status = "primary", 
-      closable = FALSE,
-      maximizable = TRUE, 
-      solidHeader = TRUE, 
-      collapsible = TRUE,
-      plotly::plotlyOutput("plot_stl")
-    ))
-
+    )
+ )
 )
 
 
@@ -798,9 +790,18 @@ shinyApp(
       data %>%
         dplyr::group_by(id) %>%
         dplyr::filter(id == item()) %>% 
-        plot_stl_diagnostics(  date, value,
-                               .feature_set = c("observed","season","trend","remainder"),
-                               .interactive = T)
+        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+        add_lines(x = ~date,
+                  y = ~remainder,
+                  line = list(color = "rgb(105, 175, 94)"),
+                  name = "Restante") %>%
+        layout(showlegend = T,
+               title='',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = "Ano",
+                            gridcolor = 'ffff'))
     })
     
     
@@ -867,12 +868,16 @@ shinyApp(
         dplyr::mutate(Produto = paste(produte,unit,sep = " ")) %>% 
         dplyr::group_by(my,Produto) %>% 
           dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>%
-          dplyr::arrange(desc(my)) %>% 
+          dplyr::arrange(desc(my)) %>%  
             tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
-                           values_from = value)    %>%  
-                             DT::datatable(filter = 'top', options = list(
-                               language = pt,
-                              pageLength = 10, autoWidth = TRUE,scrollX = TRUE)) 
+                           values_from = value)  %>% 
+                             DT::datatable(filter = 'top', 
+                                           options = list(
+                                           language = pt,
+                                           mark = ",",
+                                           pageLength = 10, 
+                                           autoWidth = TRUE,
+                                           scrollX = TRUE)) 
       })
     
     ###### tab de explorator data --- ########################
@@ -909,11 +914,6 @@ shinyApp(
    
     # card API ----------------------------------------------------------------
     
-    output$cardAPIPlot <- renderPlot({
-      if (input$mycard$maximized) {
-        hist(rnorm(input$obsAPI))
-      }
-    })
     
     observeEvent(input$triggerCard, {
       updateBox(id = "mycard", action = input$cardAction)
@@ -960,62 +960,10 @@ shinyApp(
       )
     })
 
-    # tabBox API  -------------------------------------------------------------
-    
-    observeEvent(input$update_tabBox2, {
-      updateBox("tabcard2_box", action = "toggleMaximize")
-    })
-    
-    # update sidebar ----------------------------------------------------------
-    
-    observeEvent(input$sidebarToggle, {
-      updateSidebar(id = "sidebar")
-    })
-    
-    # user messages -----------------------------------------------------------
-    
-    observeEvent(input$remove_message, {
-      updateUserMessages("message", action = "remove", index = input$index_message)
-    })
-    observeEvent(input$add_message, {
-      updateUserMessages(
-        "message",
-        action = "add",
-        content = list(
-          author = "David",
-          date = "Now",
-          image = "https://i.pinimg.com/originals/f1/15/df/f115dfc9cab063597b1221d015996b39.jpg",
-          type = "received",
-          text = "Message content"
-        )
-      )
-    })
-    
-    observeEvent(input$update_message, {
-      updateUserMessages(
-        "message",
-        action = "update",
-        index = input$index_message,
-        content = list(
-          text = tagList(
-            appButton(
-              inputId = "reload",
-              label = "Click me!",
-              icon = icon("arrows-rotate"),
-              dashboardBadge(1, color = "primary")
-            )
-          )
-        )
-      )
-    })
-    
-    observeEvent(input$reload, {
-      showNotification("Yeah!", duration = 1, type = "default")
-    })
+
+   
     
     
-    
-    # user menu ---------------------------------------------------------------
    
   }
 
