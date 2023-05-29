@@ -27,6 +27,8 @@ nested_data_tbl <- data %>%
   )
 
 
+
+
 ##################################################
 
 rec_complete <- recipe(value ~ . , 
