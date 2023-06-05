@@ -1,5 +1,5 @@
 # Base preço dos alimentos Ceasa
-Dados_Ceasa_Preco <- readxl::read_excel("E:/edime/Thalis/MEU/Ceasa/shiny_ceasa/R/utils/Dados.xlsx", 
+Dados_Ceasa_Preco <- readxl::read_excel("E:/Thalis/MEU/Ceasa/shiny_ceasa/R/utils/Dados.xlsx", 
                                 col_types = c("text", "text", "text", "numeric", "date"))
 
 

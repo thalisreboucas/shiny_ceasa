@@ -6,7 +6,9 @@ pacman::p_load(plotly, # Making dynamic graphs
                timetk, # Making a tables and graph's of timeseries
                lubridate, # Working if date
                easystats, # making a spells on the datas.
-               imputeTS)
+               imputeTS,
+               recipes,
+               workspace)
 ##########################################
 
 
@@ -14,16 +16,16 @@ nested_data_tbl <- data %>%
   extend_timeseries(
     .id_var        = id,
     .date_var      = date,
-    .length_future = 180
+    .length_future = 60
   ) %>%
   
   nest_timeseries(
     .id_var        = id,
-    .length_future = 180,
+    .length_future = 60,
     .length_actual = 180*2
   ) %>%
   split_nested_timeseries(
-    .length_test = 180
+    .length_test = 60
   )
 
 
