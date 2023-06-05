@@ -8,7 +8,8 @@ pacman::p_load(plotly, # Making dynamic graphs
                easystats, # making a spells on the datas.
                imputeTS,
                recipes,
-               workspace)
+               workflows,
+               parsnip)
 ##########################################
 
 
@@ -169,7 +170,7 @@ See_the_Results <- function(product_id){
 }
 
 
-See_the_traning(1)
+See_the_traning(3)
 See_the_Forecast(1) 
 See_the_Results(1)
 
