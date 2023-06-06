@@ -22,8 +22,7 @@ nested_data_tbl <- data %>%
   
   nest_timeseries(
     .id_var        = id,
-    .length_future = 60,
-    .length_actual = 180*2
+    .length_future = 60
   ) %>%
   split_nested_timeseries(
     .length_test = 60
@@ -40,12 +39,13 @@ rec_complete <- recipe(value ~ . ,
   step_rm() %>%
   step_zv(all_predictors())
 
-rec_nnar <- recipe(value ~ date , extract_nested_train_split(nested_data_tbl)) 
+rec_nnar <- recipe(value ~ date  , extract_nested_train_split(nested_data_tbl)) %>% 
+  timetk::step_timeseries_signature(date)
 ###########################
 
 wflw_prophet_01 <- workflow() %>%
   add_model(prophet_boost(seasonality_daily = F,
-                          seasonality_weekly = F,
+                          seasonality_weekly = T,
                           seasonality_yearly = T,
                           growth = 'linear',
                           learn_rate = 0.3,
@@ -61,9 +61,9 @@ wflw_prophet_01 <- workflow() %>%
 wflw_prophet_02 <- workflow() %>%
   add_model(prophet_boost(seasonality_daily = F,
                           seasonality_weekly = T,
-                          seasonality_yearly = T,
+                          seasonality_yearly = F,
                           growth = 'linear',
-                          learn_rate = 0.3,
+                          learn_rate = 0.8,
                           mtry = 5,
                           trees = 12,
                           tree_depth =  1000
@@ -75,9 +75,9 @@ wflw_prophet_02 <- workflow() %>%
 wflw_prophet_03 <- workflow() %>%
   add_model(prophet_boost(seasonality_daily = F,
                           seasonality_weekly = T,
-                          seasonality_yearly = T,
+                          seasonality_yearly = F,
                           growth = 'linear',
-                          learn_rate = 0.1,
+                          learn_rate = 0.25,
                           mtry = 5,
                           trees = 12,
                           tree_depth =  1000
@@ -93,17 +93,17 @@ wflw_arima_01 <- workflow() %>%
                         trees = 12,
                         tree_depth = 1000
   ) %>%
-    set_engine("arima_xgboost")  
+    set_engine("auto_arima_xgboost")  
   ) %>%
   add_recipe(rec_complete)
 
 wflw_arima_02 <- workflow() %>%
-  add_model(arima_boost(learn_rate = 0.1,
+  add_model(arima_boost(learn_rate = 0.5,
                         mtry = 5,
                         trees = 12,
                         tree_depth = 1000
   ) %>%
-    set_engine("arima_xgboost")  
+    set_engine("auto_arima_xgboost")  
   ) %>%
   add_recipe(rec_complete)
 
@@ -151,13 +151,22 @@ nested_modeltime_tbl %>%
   plot_modeltime_forecast(  )
 }
 
+
+data_traing <- nested_modeltime_tbl %>% 
+                extract_nested_test_forecast() %>%
+                group_by(id) 
+
+
+
+
 # see the forecast
 See_the_Forecast <- function(product_id){
 nested_modeltime_refit_tbl %>%
   extract_nested_future_forecast() %>%
   group_by(id) %>%
   filter(id == product_id ) %>% 
-  plot_modeltime_forecast(  )
+  plot_modeltime_forecast( .conf_interval_show = T,
+                           .plotly_slider = T )
 }
 
 # see the resuduals
@@ -170,8 +179,12 @@ See_the_Results <- function(product_id){
 }
 
 
-See_the_traning(3)
+See_the_traning(1)
 See_the_Forecast(1) 
 See_the_Results(1)
 
+
+residuals_tbl <- models_tbl %>%
+  modeltime_calibrate(new_data = testing(splits)) %>%
+  modeltime_residuals()
 
