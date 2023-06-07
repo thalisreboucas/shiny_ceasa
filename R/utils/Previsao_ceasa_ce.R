@@ -175,13 +175,17 @@ See_the_Results <- function(product_id){
   nested_modeltime_tbl %>% 
     extract_nested_test_accuracy() %>%
     group_by(id) %>%
-    filter(id == product_id )
+    filter(id == product_id ) 
+  
+  
+  
 }
 
 
 See_the_traning(1)
 See_the_Forecast(1) 
 See_the_Results(1)
+
 
 
 residuals_tbl <- models_tbl %>%

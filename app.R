@@ -234,9 +234,76 @@ actual_price_tab <- tabItem(
 forcast_model_tab <- tabItem(
   tabName = "forecast_tab",
   fluidRow(
-    
+    box(
+      closable = FALSE, 
+      width = 3,
+      solidHeader = TRUE, 
+      status = "navy",
+      collapsible = TRUE,
+      selectInput(
+        inputId = "item_2",
+        label = "Escolha o item:",
+        c(
+          "ABACATE"=1,
+          "ABACAXI"=2,
+          "ABOBORA"=3,
+          "ABOBRINHA"=4,
+          "ALFACE"=5,
+          "ALHO"=6,
+          "BANANA NANICA"=7,
+          "BANANA PRATA"=8,
+          "BATATA"=9,
+          "BATATA DOCE"=10,
+          "BERINJELA"=11,
+          "BETERRABA"=12,
+          "BROCOLO"=13,
+          "CARA"=14,
+          "CEBOLA"=15,
+          "CENOURA"=16,
+          "CHUCHU"=17,
+          "COCO VERDE"=18,
+          "COUVE"=19,
+          "COUVE-FLOR"=20,
+          "GOIABA"=21,
+          "INHAME"=22,
+          "JILO"=23,
+          "LARANJA PERA"=24,
+          "LIMAO TAHITI"=25,
+          "MACA"=26,
+          "MAMAO FORMOSA"=27,
+          "MAMAO HAWAY"=28,
+          "MANDIOCA"=29,
+          "MANDIOQUINHA"=30,
+          "MANGA"=31,
+          "MARACUJA AZEDO"=32,
+          "MELANCIA"=33,
+          "MELAO AMARELO"=34,
+          "MILHO VERDE"=35,
+          "MORANGO"=36,
+          "OVOS"=37,
+          "PEPINO"=38,
+          "PERA IMPORTADA"=39,
+          "PIMENTAO VERDE"=40,
+          "QUIABO"=41,
+          "REPOLHO"=42,
+          "TANGERINA"=43,
+          "TOMATE"=44,
+          "UVA ITALIA"=45,
+          "UVA NIAGARA"=46,
+          "VAGEM"=47))),
+    box(
+      title = "Gráfico de Treino do modelo", 
+      width = 12,
+      status = "navy", 
+      closable = FALSE,
+      maximizable = TRUE, 
+      solidHeader = TRUE,
+      collapsible = TRUE,
+      tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_training_model"))
+    )
   )
 )
+
 
 # theory_tab ---- 
 theory_tab <- tabItem(
@@ -409,6 +476,7 @@ shinyApp(
   server = function(input, output, session) {
     useAutoColor(T)
     item <- reactive(as.numeric({input$item}))
+    item_2 <- reactive(as.numeric({input$item_2}))
     year_violin <- reactive(as.numeric({input$year_violin}))
     # alerts ------------------------------------------------------------------
     observeEvent(input$show_alert, {
@@ -712,6 +780,37 @@ shinyApp(
           yaxis = list(title = "Correlação PACF" ),
           xaxis = list(title = "Quantidade de Lags"))
       
+    })
+    
+    ############################# forecast model ################
+    output$plot_training_model <- plotly::renderPlotly({
+      data_traing %>%
+      plot_ly() %>%
+      add_lines( data = data_traing %>% filter(id == item_2(),.key == "actual"),
+                 x = ~.index,
+                 y = ~.value,
+                 line = list(color = "rgb(105, 175, 94)"),
+                 name = "Dados") %>%
+      add_lines( data = data_traing %>% 
+                   group_by(.model_id) %>%
+                   filter(id == item_2(),.key == "prediction"),
+                 x = ~.index,
+                 y = ~.value,
+                 color = ~.model_desc,
+                 name = ~Name_models) %>%
+      # add_ribbons(x ~.index,
+      #             ymin = ~.conf_lo,
+      #              ymax = ~.conf_hi,
+      #             color = ~Name_models) %>% 
+      layout(showlegend = T,
+             title='',
+             yaxis = list(title = "Preço",
+                          tickprefix = "R$",
+                          gridcolor = 'ffff'),
+             xaxis = list(title = "Dia",
+                          gridcolor = 'ffff',
+                          rangeslider = list(visible = T)))
+    
     })
     
     
