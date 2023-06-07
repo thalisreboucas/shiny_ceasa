@@ -13,7 +13,16 @@ data_traing <- nested_modeltime_tbl %>%
 
 data_metrics <- nested_modeltime_tbl %>% 
   extract_nested_test_accuracy() %>%
-  group_by(id) 
+  group_by(id) %>% 
+  dplyr::mutate ( Name_models =
+                    dplyr::case_when(
+                      .model_id == 1 ~ "Prophet XG 1",
+                      .model_id == 2 ~ "Prophet XG 2",
+                      .model_id == 3 ~ "Prophet XG 3",
+                      .model_id == 4 ~ "Arima XG 1",
+                      .model_id == 5 ~ "Arima XG 1",
+                      .model_id == 6 ~ "NNAR"
+                    ))
 
 
 data_traing %>%

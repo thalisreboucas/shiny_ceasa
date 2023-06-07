@@ -8,7 +8,10 @@ pacman::p_load(shiny,shinydashboard,
                lubridate, # Working if date
                easystats, # making a spells on the datas.
                imputeTS,
-               readxl)
+               readxl,
+               recipes,
+               workflows,
+               parsnip)
 
 thematic_shiny()
 
@@ -165,8 +168,7 @@ actual_price_tab <- tabItem(
       label = "Escolha o ano:",
       choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
       selected = 2023)
-    )
-    ,
+    ),
     box(
       title = "Tabela com medidas de escala e dispersão", 
       closable = FALSE, 
@@ -291,6 +293,15 @@ forcast_model_tab <- tabItem(
           "UVA ITALIA"=45,
           "UVA NIAGARA"=46,
           "VAGEM"=47))),
+    box(
+      title = "Tabela com as medricas dos modelos", 
+      closable = FALSE, 
+      width = 9,
+      solidHeader = TRUE, 
+      status = "primary",
+      collapsible = TRUE,
+      tableOutput("metrics_models")
+    ),
     box(
       title = "Gráfico de Treino do modelo", 
       width = 12,
@@ -853,6 +864,12 @@ shinyApp(
                                                          Maxímo = max(.value),
                                                          Amplitude = (max(.value) -min(.value))) 
                                      
+    })
+    
+    
+    output$metrics_models <- renderTable({data_metrics %>% 
+                              dplyr::filter(id == item_2()) %>% 
+                              dplyr::select(-id,.model_id,.model_desc,.type)
     })
     
    output$tbl_1 <- DT::renderDataTable({

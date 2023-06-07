@@ -1,17 +1,4 @@
-#########################################
-library(pacman)
-pacman::p_load(plotly, # Making dynamic graphs
-               modeltime, # Times model classics 
-               tidyverse, # All tidy for manipulation
-               timetk, # Making a tables and graph's of timeseries
-               lubridate, # Working if date
-               easystats, # making a spells on the datas.
-               imputeTS,
-               recipes,
-               workflows,
-               parsnip)
 ##########################################
-
 
 nested_data_tbl <- data %>%
   extend_timeseries(
@@ -130,9 +117,16 @@ nested_modeltime_tbl <- modeltime_nested_fit(
   wflw_nnetar
 )
 
+remove( rec_complete,
+        rec_nnar,
+        wflw_prophet_01,
+        wflw_prophet_02,
+        wflw_prophet_03,
+        wflw_arima_01,
+        wflw_arima_02,
+        wflw_nnetar)
 
-
-###################### Prediction models
+###################### Prediction models #################
 
 nested_modeltime_refit_tbl <-   modeltime_nested_refit(object = nested_modeltime_tbl,
     control = control_nested_refit(verbose = TRUE)
@@ -150,13 +144,6 @@ nested_modeltime_tbl %>%
   filter(id == product_id) %>% 
   plot_modeltime_forecast(  )
 }
-
-
-data_traing <- nested_modeltime_tbl %>% 
-                extract_nested_test_forecast() %>%
-                group_by(id) 
-
-
 
 
 # see the forecast
