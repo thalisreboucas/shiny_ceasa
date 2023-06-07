@@ -32,8 +32,58 @@ pt <- list(
   )
 
 
+data_traing <- nested_modeltime_tbl %>% 
+  extract_nested_test_forecast() %>%
+  group_by(id) %>% 
+  dplyr::mutate ( Name_models =
+                    dplyr::case_when(
+                      .model_id == 1 ~ "Prophet XG 1",
+                      .model_id == 2 ~ "Prophet XG 2",
+                      .model_id == 3 ~ "Prophet XG 3",
+                      .model_id == 4 ~ "Arima XG 1",
+                      .model_id == 5 ~ "Arima XG 2",
+                      .model_id == 6 ~ "NNAR"
+                    ))
+
+data_metrics <- nested_modeltime_tbl %>% 
+  extract_nested_test_accuracy() %>%
+  group_by(id) %>% 
+  dplyr::mutate ( Name_models =
+                    dplyr::case_when(
+                      .model_id == 1 ~ "Prophet XG 1",
+                      .model_id == 2 ~ "Prophet XG 2",
+                      .model_id == 3 ~ "Prophet XG 3",
+                      .model_id == 4 ~ "Arima XG 1",
+                      .model_id == 5 ~ "Arima XG 2",
+                      .model_id == 6 ~ "NNAR"
+                    ))
 
 
 
+min_date <- nested_modeltime_tbl %>% 
+  extract_nested_test_forecast() %>%
+  filter(.key == "prediction") %>% select(-id) %>% 
+  summarise(min_date = unique(min(.index)))
 
-                                  
+actual <- nested_modeltime_tbl %>% 
+  extract_nested_test_forecast() %>%
+  filter(.index >= min_date , .key == "actual") %>% 
+  select(-.model_id,-.model_desc,-.conf_lo,-.conf_hi) %>% view()
+
+prediction <- nested_modeltime_tbl %>% 
+  extract_nested_test_forecast() %>%
+  filter(.index >= min_date , .key == "prediction") %>% 
+  dplyr::mutate ( Name_models =
+                    dplyr::case_when(
+                      .model_id == 1 ~ "Prophet XG 1",
+                      .model_id == 2 ~ "Prophet XG 2",
+                      .model_id == 3 ~ "Prophet XG 3",
+                      .model_id == 4 ~ "Arima XG 1",
+                      .model_id == 5 ~ "Arima XG 2",
+                      .model_id == 6 ~ "NNAR"),
+                    pred_value = .value) %>% 
+  select(-.conf_lo,-.conf_hi,-.value) 
+
+ resuadual <- inner_join(actual,prediction,by = c("id",".index"))  %>% group_by(id,.index,Name_models) %>%  summarise( residual = .value-pred_value)                     
+ 
+           

@@ -298,7 +298,7 @@ forcast_model_tab <- tabItem(
       closable = FALSE, 
       width = 9,
       solidHeader = TRUE, 
-      status = "primary",
+      status = "navy",
       collapsible = TRUE,
       tableOutput("metrics_models")
     ),
@@ -869,7 +869,7 @@ shinyApp(
     
     output$metrics_models <- renderTable({data_metrics %>% 
                               dplyr::filter(id == item_2()) %>% 
-                              dplyr::select(-id,.model_id,.model_desc,.type)
+                              dplyr::select(-id,-.model_id,-.model_desc,-.type)
     })
     
    output$tbl_1 <- DT::renderDataTable({
