@@ -84,6 +84,14 @@ prediction <- nested_modeltime_tbl %>%
                     pred_value = .value) %>% 
   select(-.conf_lo,-.conf_hi,-.value) 
 
- resuadual <- inner_join(actual,prediction,by = c("id",".index"))  %>% group_by(id,.index,Name_models) %>%  summarise( residual = .value-pred_value)                     
+ residual <- inner_join(actual,prediction,by = c("id",".index"))  %>% group_by(id,.index,Name_models) %>%  summarise( residual = .value-pred_value)                     
+
  
+ 
+ residual %>% filter(id == 1) %>% 
+              ungroup() %>% 
+              group_by(Name_models) %>% 
+              summarise( Média = mean(residual), 
+                        `Desvio Padrão` = sd(residual),
+                         Mediana = median(residual))
            
