@@ -11,7 +11,9 @@ data_traing <- nested_modeltime_tbl %>%
       .model_id == 6 ~ "NNAR"
   ))
 
-
+data_metrics <- nested_modeltime_tbl %>% 
+  extract_nested_test_accuracy() %>%
+  group_by(id) 
 
 
 data_traing %>%
@@ -42,9 +44,9 @@ add_lines( data = data_traing %>% filter(id == 1,.key == "actual"),
                       rangeslider = list(visible = T)))
 
 
-data_traing %>% 
-extract_nested_test_accuracy() %>%
-  group_by(id) %>%
-  filter(id == 1 ) 
+### fazer tabela de metricas
 
+## fazer grafico de previsão
+
+## fazer residuos e graficos / testes
 
