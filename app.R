@@ -928,9 +928,27 @@ shinyApp(
     })
     
     
-    output$metrics_models <- renderTable({data_metrics |>  
+    output$metrics_models <- renderTable({
+                              a <- data_metrics |>  
                               dplyr::filter(id == item_2()) |>  
-                              dplyr::select(-id,-.model_id,-.model_desc,-.type)
+                              dplyr::select(-id,-.model_id,-.model_desc,-.type) |> 
+                              dplyr::rename(Modelo = Name_models) |> 
+                              dplyr::select(Modelo,mae,mape,mase,smape,rmse,rsq) 
+                              b <- residual |> dplyr::filter(id == item_2())|> 
+                                dplyr::ungroup() |> 
+                                dplyr::group_by(Name_models) |> 
+                                dplyr::rename(Modelo = Name_models) |> 
+                                dplyr::summarise( Média = mean(residual), 
+                                                  `Desvio Padrão` = sd(residual),
+                                                  Mediana = median(residual),
+                                                  `Teste Shapiro` = (if(shapiro.test(residual)$p.value > 0.05 )
+                                                    "Normal"
+                                                    else "Não Normal"),
+                                                  `Teste Box-Pierce` = (if(stats::Box.test(residual)$p.value > 0.05 )
+                                                    "Independente"
+                                                    else "Dependente"))
+                              
+                              inner_join(a,b,by = "Modelo") 
     })
     
    output$tbl_1 <- DT::renderDataTable({
