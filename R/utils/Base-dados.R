@@ -86,18 +86,26 @@ prediction <- nested_modeltime_tbl %>%
 
  residual <- inner_join(actual,prediction,by = c("id",".index"))  %>% group_by(id,.index,Name_models) %>%  summarise( residual = .value-pred_value)                     
 
- 
+ data_metrics |>  
+   dplyr::filter(id == item_2()) |>  
+   dplyr::select(-id,-.model_id,-.model_desc,-.type)
  
  residual %>% filter(id == 1) %>% 
               ungroup() %>% 
               group_by(Name_models) %>% 
               summarise( Média = mean(residual), 
                         `Desvio Padrão` = sd(residual),
-                         Mediana = median(residual))
- 
- 
+                         Mediana = median(residual),
+                        `Teste Shapiro` = (if(shapiro.test(residual)$p.value > 0.05 )
+                          "Normal"
+                        else "Não Normal"),
+                        `Teste Box-Pierce` = (if(stats::Box.test(residual)$p.value > 0.05 )
+                          "Independente"
+                          else "Dependente")
+                        
+                        
+              )
  
 
- ## fazer 
  
    

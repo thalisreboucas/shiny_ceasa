@@ -548,16 +548,16 @@ shinyApp(
     # plots -------------------------------------------------------------------
     
     output$plot_eda <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_anomaly_diagnostics(.value = value,.date_var = date) |>  plot_ly() |> 
         add_lines(x = ~date,
                   y = ~observed,
                   line = list(color = "rgb(105, 175, 94)"),
-                  name = "Dados") %>%
+                  name = "Dados") |> 
         add_lines(x = ~date , y = ~trend , name ="tendência" ,
-                  line = list(color = "rgb(4, 86, 74)")) %>% 
+                  line = list(color = "rgb(4, 86, 74)")) |>  
         layout(showlegend = T,
                title='',
                yaxis = list(title = "Preço",
@@ -570,29 +570,29 @@ shinyApp(
       })
     
     output$plot_an <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_anomaly_diagnostics(.value = value,.date_var = date) |>  plot_ly() |> 
         add_lines(x = ~date,
                   y = ~observed,
                   line = list(color = "rgb(105, 175, 94)"),
-                  name = "Dados") %>%
+                  name = "Dados") |> 
         add_ribbons(x = ~date,
                     ymin = ~recomposed_l1,
                     ymax = ~recomposed_l2,
                     line = list(color = "rgba(105, 172, 135 ,0.5)"),
                     fillcolor = "rgba(105, 172, 135, 0.3)",
-                    name = "Fator IQR") %>% 
+                    name = "Fator IQR") |>  
         add_markers(x = ~date,
                     y = ~observed,
                     marker = list(color = "#ff0000"),
-                    data =  data %>%
-                      dplyr::group_by(id) %>%
-                      dplyr::filter(id == item()) %>%  
-                      tk_anomaly_diagnostics(.value = value,.date_var = date) %>% 
+                    data =  data |> 
+                      dplyr::group_by(id) |> 
+                      dplyr::filter(id == item()) |>   
+                      tk_anomaly_diagnostics(.value = value,.date_var = date) |>  
                       dplyr::filter(anomaly == "Yes") ,
-                    name = 'Anomalia')%>%
+                    name = 'Anomalia')|> 
         layout(showlegend = T,
                title='',
                yaxis = list(title = "Preço",
@@ -608,11 +608,11 @@ shinyApp(
     
     
     output$plot_violin <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-        dplyr::filter(year == year_violin()) %>% 
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::filter(year == year_violin()) |>  
         plot_ly(
           y = ~.value,
           x= ~year,
@@ -624,7 +624,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -634,11 +634,11 @@ shinyApp(
     })
     
     output$plot_violin_month <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-        dplyr::filter(year == year_violin()) %>% 
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::filter(year == year_violin()) |>  
         plot_ly(
           y = ~.value,
           x= ~month.lbl,
@@ -650,7 +650,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -660,11 +660,11 @@ shinyApp(
     })
     
     output$plot_violin_week <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-        dplyr::filter(year == year_violin()) %>% 
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::filter(year == year_violin()) |>  
         plot_ly(
           y = ~.value,
           x= ~wday.lbl,
@@ -676,7 +676,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -686,11 +686,11 @@ shinyApp(
     })
     
     output$plot_violin_weeks <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-        dplyr::filter(year == year_violin()) %>% 
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::filter(year == year_violin()) |>  
         plot_ly(
           y = ~.value,
           x= ~week,
@@ -702,7 +702,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -713,11 +713,11 @@ shinyApp(
     
     
     output$plot_violin_quarter <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-        dplyr::filter(year == year_violin()) %>% 
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::filter(year == year_violin()) |>  
         plot_ly(
           y = ~.value,
           x= ~quarter,
@@ -729,7 +729,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -739,14 +739,14 @@ shinyApp(
     })
     
     output$plot_stl <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_anomaly_diagnostics(.value = value,.date_var = date) %>% plot_ly() %>%
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_anomaly_diagnostics(.value = value,.date_var = date) |>  plot_ly() |> 
         add_lines(x = ~date,
                   y = ~remainder,
                   line = list(color = "rgb(105, 175, 94)"),
-                  name = "Restante") %>%
+                  name = "Restante") |> 
         layout(showlegend = T,
                title='',
                yaxis = list(title = "Preço",
@@ -758,23 +758,23 @@ shinyApp(
     
     
     output$plot_acf <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_acf_diagnostics(.date_var = date,.value = value) %>% 
-        plot_ly() %>%
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_acf_diagnostics(.date_var = date,.value = value) |>  
+        plot_ly() |> 
         add_lines(x = ~lag,
                   y = ~ACF,
                   line = list(color = "rgb(105, 175, 94)"),
-                  name = "Correlação ACF") %>%
+                  name = "Correlação ACF") |> 
         add_lines(y = ~.white_noise_lower,
                   x = ~lag,
                   line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
-                  name = "Ruído Branco inferior ") %>%
+                  name = "Ruído Branco inferior ") |> 
         add_lines(y = ~.white_noise_upper,
                   x = ~lag,
                   line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
-                  name = "Ruído Branco superior") %>% 
+                  name = "Ruído Branco superior") |>  
         layout(
           yaxis = list(title = "Correlação ACF" ),
           xaxis = list(title = "Quantidade de Lags"))
@@ -783,28 +783,28 @@ shinyApp(
     
     
     output$plot_pacf <-  plotly::renderPlotly({
-      data %>%
-        dplyr::group_by(id) %>%
-        dplyr::filter(id == item()) %>% 
-        tk_acf_diagnostics(.date_var = date,.value = value) %>% 
-        plot_ly() %>%
+      data |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item()) |>  
+        tk_acf_diagnostics(.date_var = date,.value = value) |>  
+        plot_ly() |> 
         add_lines(x = ~lag,
                   y = ~PACF,
                   line = list(color = "rgb(105, 175, 94)"),
-                  name = "Correlação PACF") %>%
+                  name = "Correlação PACF") |> 
         add_markers(x = ~lag,
                     y = ~PACF,
                     marker = list(color = "rgb(105, 175, 94)",
                                   size = 4),
-                    name = "Pontos da Correlação ACF") %>% 
+                    name = "Pontos da Correlação ACF") |>  
         add_lines(y = ~.white_noise_lower,
                   x = ~lag,
                   line = list(color = "rgb(0, 0, 0)",dash = 'dash'),
-                  name = "Ruído Branco inferior ") %>%
+                  name = "Ruído Branco inferior ") |> 
         add_lines(y = ~.white_noise_upper,
                   x = ~lag,
                   line = list(color = "rgba(0, 0, 0 )",dash = 'dash'),
-                  name = "Ruído Branco superior") %>% 
+                  name = "Ruído Branco superior") |>  
         layout(
           yaxis = list(title = "Correlação PACF" ),
           xaxis = list(title = "Quantidade de Lags"))
@@ -813,24 +813,24 @@ shinyApp(
     
     ############################# forecast model ################
     output$plot_training_model <- plotly::renderPlotly({
-      data_traing %>%
-      plot_ly() %>%
-      add_lines( data = data_traing %>% filter(id == item_2(),.key == "actual"),
+      data_traing |> 
+      plot_ly() |> 
+      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual"),
                  x = ~.index,
                  y = ~.value,
                  line = list(color = "rgb(105, 175, 94)"),
-                 name = "Dados") %>%
-      add_lines( data = data_traing %>% 
-                   group_by(.model_id) %>%
+                 name = "Dados") |> 
+      add_lines( data = data_traing |>  
+                   group_by(.model_id) |> 
                    filter(id == item_2(),.key == "prediction"),
                  x = ~.index,
                  y = ~.value,
                  color = ~.model_desc,
-                 name = ~Name_models) %>%
+                 name = ~Name_models) |> 
       # add_ribbons(x ~.index,
       #             ymin = ~.conf_lo,
       #              ymax = ~.conf_hi,
-      #             color = ~Name_models) %>% 
+      #             color = ~Name_models) |>  
       layout(showlegend = T,
              title='',
              yaxis = list(title = "Preço",
@@ -844,16 +844,16 @@ shinyApp(
     
     
     output$plot_rbs <-  plotly::renderPlotly({
-      residual %>% filter(id == item_2()) %>% 
-        ungroup() %>% 
-        group_by(Name_models) %>% 
+      residual |>  filter(id == item_2()) |>  
+        ungroup() |>  
+        group_by(Name_models) |>  
         plot_ly(
           x= ~.index,
           y = ~residual,
           color = ~Name_models,
           name = ~Name_models,
           type = 'scatter', mode = 'lines'
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Resíduos",
@@ -862,9 +862,9 @@ shinyApp(
     })
     
     output$plot_rbb <-  plotly::renderPlotly({
-      residual %>% filter(id == item_2()) %>% 
-        ungroup() %>% 
-        group_by(Name_models) %>% 
+      residual |>  filter(id == item_2()) |>  
+        ungroup() |>  
+        group_by(Name_models) |>  
         plot_ly(
           y = ~residual,
           type = 'violin',
@@ -875,7 +875,7 @@ shinyApp(
           meanline = list(
             visible = T
           )
-        ) %>% 
+        ) |>  
         layout(showlegend = F,
                title=' ',
                yaxis = list(title = "Preço",
@@ -888,14 +888,14 @@ shinyApp(
     
     ##### tab 1 ---- actual price ###################
     output$tbl <- DT::renderDataTable({
-      data %>% dplyr::mutate(my = zoo::as.yearmon(date)) %>% 
-        dplyr::filter( date >= input$dateRange[2] &  date <= input$dateRange[1] ) %>% 
-        dplyr::mutate(Produto = paste(produte,unit,sep = " ")) %>% 
-        dplyr::group_by(my,Produto) %>% 
-          dplyr::summarise(value = round(mean(value),2)) %>% drop_na() %>%
-          dplyr::arrange(desc(my)) %>%  
+      data |>  dplyr::mutate(my = zoo::as.yearmon(date)) |>  
+        dplyr::filter( date >= input$dateRange[2] &  date <= input$dateRange[1] ) |>  
+        dplyr::mutate(Produto = paste(produte,unit,sep = " ")) |>  
+        dplyr::group_by(my,Produto) |>  
+          dplyr::summarise(value = round(mean(value),2)) |>  drop_na() |> 
+          dplyr::arrange(desc(my)) |>   
             tidyr::pivot_wider(id_cols = "Produto", names_from = my, 
-                           values_from = value)  %>% 
+                           values_from = value)  |>  
                              DT::datatable(filter = 'top', 
                                            options = list(
                                            language = pt,
@@ -907,12 +907,13 @@ shinyApp(
     
     ###### tab de explorator data --- ########################
     
-    output$tbl_eda_1 <- renderTable({ data %>%
-                                       dplyr::group_by(id) %>%
-                                       dplyr::filter(id == item()) %>% 
-                                       timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) %>% 
-                                       dplyr::group_by(year) %>% 
-                                       dplyr::filter(year == year_violin()) %>%
+    output$tbl_eda_1 <- renderTable({ data |> 
+                                       dplyr::group_by(id) |> 
+                                       dplyr::filter(id == item()) |>  
+                                       timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+                                       dplyr::group_by(year) |>  
+                                       dplyr::filter(year == year_violin()) |> 
+                                       dplyr::rename(Ano = year) |> 
                                        dplyr::summarize( Mínimo = min(.value),
                                                          Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                                                          IQR = IQR(.value) , 
@@ -927,18 +928,18 @@ shinyApp(
     })
     
     
-    output$metrics_models <- renderTable({data_metrics %>% 
-                              dplyr::filter(id == item_2()) %>% 
+    output$metrics_models <- renderTable({data_metrics |>  
+                              dplyr::filter(id == item_2()) |>  
                               dplyr::select(-id,-.model_id,-.model_desc,-.type)
     })
     
    output$tbl_1 <- DT::renderDataTable({
-   data %>% dplyr::group_by(produte) %>% 
-     dplyr::filter(date >= input$dateRange[2] & date <= input$dateRange[1] ) %>% 
-      dplyr::mutate(Produto = paste(produte,unit,sep = " ")) %>% 
-   dplyr::arrange(desc(date)) %>%  
+   data |>  dplyr::group_by(produte) |>  
+     dplyr::filter(date >= input$dateRange[2] & date <= input$dateRange[1] ) |>  
+      dplyr::mutate(Produto = paste(produte,unit,sep = " ")) |>  
+   dplyr::arrange(desc(date)) |>   
      tidyr::pivot_wider(id_cols = "Produto", names_from = date, 
-                        values_from = value)    %>%  
+                        values_from = value)    |>   
      DT::datatable(filter = 'top', options = list(
        language = pt,
        pageLength = 11, autoWidth = TRUE,scrollX = TRUE))

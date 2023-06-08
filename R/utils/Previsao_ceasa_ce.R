@@ -175,7 +175,4 @@ See_the_Results(1)
 
 
 
-residuals_tbl <- models_tbl %>%
-  modeltime_calibrate(new_data = testing(splits)) %>%
-  modeltime_residuals()
 
