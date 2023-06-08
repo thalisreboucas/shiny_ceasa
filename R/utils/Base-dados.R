@@ -94,4 +94,10 @@ prediction <- nested_modeltime_tbl %>%
               summarise( Média = mean(residual), 
                         `Desvio Padrão` = sd(residual),
                          Mediana = median(residual))
-           
+ 
+ 
+ 
+
+ ## fazer 
+ 
+   

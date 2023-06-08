@@ -311,7 +311,25 @@ forcast_model_tab <- tabItem(
       solidHeader = TRUE,
       collapsible = TRUE,
       tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_training_model"))
-    )
+    ),
+    
+    tabBox(
+      title = "Graficos Ruído Branco", 
+      closable = FALSE, 
+      width = 12,
+      status = "navy", 
+      solidHeader = TRUE, 
+      collapsible = FALSE,
+      type = "tabs",
+      selected = "Ruído Branco serie",
+      tabPanel(
+        "Ruído Branco serie",plotly::plotlyOutput("plot_rbs")
+      ) ,
+      tabPanel(
+        "Ruído Branco boxplot",
+        plotly::plotlyOutput("plot_rbb")
+      ))
+  
   )
 )
 
@@ -822,6 +840,48 @@ shinyApp(
                           gridcolor = 'ffff',
                           rangeslider = list(visible = T)))
     
+    })
+    
+    
+    output$plot_rbs <-  plotly::renderPlotly({
+      residual %>% filter(id == item_2()) %>% 
+        ungroup() %>% 
+        group_by(Name_models) %>% 
+        plot_ly(
+          x= ~.index,
+          y = ~residual,
+          color = ~Name_models,
+          name = ~Name_models,
+          type = 'scatter', mode = 'lines'
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Resíduos",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
+    })
+    
+    output$plot_rbb <-  plotly::renderPlotly({
+      residual %>% filter(id == item_2()) %>% 
+        ungroup() %>% 
+        group_by(Name_models) %>% 
+        plot_ly(
+          y = ~residual,
+          type = 'violin',
+          color = ~Name_models,
+          box = list(
+            visible = T
+          ),
+          meanline = list(
+            visible = T
+          )
+        ) %>% 
+        layout(showlegend = F,
+               title=' ',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = " "))
     })
     
     
