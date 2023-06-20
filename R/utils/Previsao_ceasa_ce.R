@@ -103,19 +103,10 @@ wflw_nnetar <- workflow() %>%
 
 
 #################################### training models
+ tictoc::tic()
  
-nested_modeltime_tbl <- modeltime_nested_fit(
-  # Nested data 
-  nested_data = nested_data_tbl,
-  
-  # Add workflows
-  wflw_prophet_01,
-  wflw_prophet_02,
-  wflw_prophet_03,
-  wflw_arima_01,
-  wflw_arima_02,
-  wflw_nnetar
-)
+
+tictoc::toc()
 
 remove( rec_complete,
         rec_nnar,

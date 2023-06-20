@@ -1,9 +1,9 @@
 # Base preço dos alimentos Ceasa
-Dados_Ceasa_Preco <- readxl::read_excel("E:/Thalis/MEU/Ceasa/shiny_ceasa/R/utils/Dados.xlsx", 
+Dados_Ceasa_Preco <- readxl::read_excel("E:/Thalis/MEU/shiny_ceasa/R/utils/Dados.xlsx", 
                                 col_types = c("text", "text", "text", "numeric", "date"))
 
 
-data <- Dados_Ceasa_Preco  %>% dplyr::select(id,produte,unit,date,value) %>%  tidyr::drop_na()
+data <- Dados_Ceasa_Preco |> dplyr::select(id,produte,unit,date,value) |>  tidyr::drop_na()
 
 remove(Dados_Ceasa_Preco)
 
@@ -31,6 +31,19 @@ pt <- list(
     )
   )
 
+
+nested_modeltime_tbl <- modeltime_nested_fit(
+  # Nested data 
+  nested_data = nested_data_tbl,
+  
+  # Add workflows
+  wflw_prophet_01,
+  wflw_prophet_02,
+  wflw_prophet_03,
+  wflw_arima_01,
+  wflw_arima_02,
+  wflw_nnetar
+)
 
 data_traing <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%
@@ -67,8 +80,8 @@ min_date <- nested_modeltime_tbl %>%
 
 actual <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%
-  filter(.index >= min_date , .key == "actual") %>% 
-  select(-.model_id,-.model_desc,-.conf_lo,-.conf_hi) %>% view()
+  dplyr::filter(.index >= min_date , .key == "actual") %>% 
+  select(-.model_id,-.model_desc,-.conf_lo,-.conf_hi) 
 
 prediction <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%
