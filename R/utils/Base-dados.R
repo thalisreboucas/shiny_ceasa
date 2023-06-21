@@ -31,6 +31,8 @@ pt <- list(
     )
   )
 
+cl = makeCluster(detectCores())
+registerDoParallel(cl)
 
 nested_modeltime_tbl <- modeltime_nested_fit(
   # Nested data 
@@ -44,6 +46,8 @@ nested_modeltime_tbl <- modeltime_nested_fit(
   wflw_arima_02,
   wflw_nnetar
 )
+
+
 
 data_traing <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%

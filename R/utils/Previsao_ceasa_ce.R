@@ -103,10 +103,6 @@ wflw_nnetar <- workflow() %>%
 
 
 #################################### training models
- tictoc::tic()
- 
-
-tictoc::toc()
 
 remove( rec_complete,
         rec_nnar,
