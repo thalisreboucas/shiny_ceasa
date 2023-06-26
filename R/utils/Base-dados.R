@@ -31,22 +31,15 @@ pt <- list(
     )
   )
 
-cl = makeCluster(detectCores())
-registerDoParallel(cl)
-
 nested_modeltime_tbl <- modeltime_nested_fit(
   # Nested data 
   nested_data = nested_data_tbl,
   
   # Add workflows
-  wflw_prophet_01,
-  wflw_prophet_02,
-  wflw_prophet_03,
-  wflw_arima_01,
-  wflw_arima_02,
+  wflw_prophet,
+  wflw_arima,
   wflw_nnetar
 )
-
 
 
 data_traing <- nested_modeltime_tbl %>% 
@@ -54,12 +47,9 @@ data_traing <- nested_modeltime_tbl %>%
   group_by(id) %>% 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
-                      .model_id == 1 ~ "Prophet XG 1",
-                      .model_id == 2 ~ "Prophet XG 2",
-                      .model_id == 3 ~ "Prophet XG 3",
-                      .model_id == 4 ~ "Arima XG 1",
-                      .model_id == 5 ~ "Arima XG 2",
-                      .model_id == 6 ~ "NNAR"
+                      .model_id == 1 ~ "Prophet XG",
+                      .model_id == 2 ~ "Arima XG",
+                      .model_id == 3 ~ "NNAR"
                     ))
 
 data_metrics <- nested_modeltime_tbl %>% 
@@ -68,11 +58,8 @@ data_metrics <- nested_modeltime_tbl %>%
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
                       .model_id == 1 ~ "Prophet XG 1",
-                      .model_id == 2 ~ "Prophet XG 2",
-                      .model_id == 3 ~ "Prophet XG 3",
-                      .model_id == 4 ~ "Arima XG 1",
-                      .model_id == 5 ~ "Arima XG 2",
-                      .model_id == 6 ~ "NNAR"
+                      .model_id == 2 ~ "Arima XG 1",
+                      .model_id == 3 ~ "NNAR"
                     ))
 
 
@@ -92,12 +79,9 @@ prediction <- nested_modeltime_tbl %>%
   filter(.index >= min_date , .key == "prediction") %>% 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
-                      .model_id == 1 ~ "Prophet XG 1",
-                      .model_id == 2 ~ "Prophet XG 2",
-                      .model_id == 3 ~ "Prophet XG 3",
-                      .model_id == 4 ~ "Arima XG 1",
-                      .model_id == 5 ~ "Arima XG 2",
-                      .model_id == 6 ~ "NNAR"),
+                      .model_id == 1 ~ "Prophet XG",
+                      .model_id == 2 ~ "Arima XG",
+                      .model_id == 3 ~ "NNAR"),
                     pred_value = .value) %>% 
   select(-.conf_lo,-.conf_hi,-.value) 
 
@@ -105,25 +89,9 @@ prediction <- nested_modeltime_tbl %>%
               dplyr::group_by(id,.index,Name_models) |> 
               dplyr::summarise( residual = .value-pred_value)                      
 
-a <- data_metrics |>  
-   dplyr::filter(id == 1) |>  
-   dplyr::select(-id,-.model_id,-.model_desc,-.type) |> 
-   dplyr::rename(Modelo = Name_models) 
 
- b <- residual |> dplyr::filter(id == 1)|> 
-              dplyr::ungroup() |> 
-              dplyr::group_by(Name_models) |> 
-              dplyr::rename(Modelo = Name_models) |> 
-              dplyr::summarise( Média = mean(residual), 
-                        `Desvio Padrão` = sd(residual),
-                         Mediana = median(residual),
-                        `Teste Shapiro` = (if(shapiro.test(residual)$p.value > 0.05 )
-                          "Normal"
-                        else "Não Normal"),
-                        `Teste Box-Pierce` = (if(stats::Box.test(residual)$p.value > 0.05 )
-                          "Independente"
-                          else "Dependente"))
- 
-inner_join(a,b,by = "Modelo") 
- 
-   
+###################### Prediction models #################
+
+nested_modeltime_refit_tbl <-   modeltime_nested_refit(object = nested_modeltime_tbl,
+                                                       control = control_nested_refit(verbose = TRUE)
+)

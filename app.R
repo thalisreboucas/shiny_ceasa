@@ -236,7 +236,7 @@ actual_price_tab <- tabItem(
 
 # forcast_model_tab ---- #########################
 forcast_model_tab <- tabItem(
-  tabName = "forecast_tab",
+  tabName = "forecast_diag_tab",
   fluidRow(
     box(
       closable = FALSE, 
@@ -335,65 +335,110 @@ forcast_model_tab <- tabItem(
   )
 )
 
+forcast_tab <- tabItem(
+  tabName = "forecast_tab",
+  fluidRow(
+    box(
+      closable = FALSE, 
+      width = 3,
+      solidHeader = TRUE, 
+      status = "navy",
+      collapsible = TRUE,
+      selectInput(
+        inputId = "item_2",
+        label = "Escolha o item:",
+        c(
+          "ABACATE"=1,
+          "ABACAXI"=2,
+          "ABOBORA"=3,
+          "ABOBRINHA"=4,
+          "ALFACE"=5,
+          "ALHO"=6,
+          "BANANA NANICA"=7,
+          "BANANA PRATA"=8,
+          "BATATA"=9,
+          "BATATA DOCE"=10,
+          "BERINJELA"=11,
+          "BETERRABA"=12,
+          "BROCOLO"=13,
+          "CARA"=14,
+          "CEBOLA"=15,
+          "CENOURA"=16,
+          "CHUCHU"=17,
+          "COCO VERDE"=18,
+          "COUVE"=19,
+          "COUVE-FLOR"=20,
+          "GOIABA"=21,
+          "INHAME"=22,
+          "JILO"=23,
+          "LARANJA PERA"=24,
+          "LIMAO TAHITI"=25,
+          "MACA"=26,
+          "MAMAO FORMOSA"=27,
+          "MAMAO HAWAY"=28,
+          "MANDIOCA"=29,
+          "MANDIOQUINHA"=30,
+          "MANGA"=31,
+          "MARACUJA AZEDO"=32,
+          "MELANCIA"=33,
+          "MELAO AMARELO"=34,
+          "MILHO VERDE"=35,
+          "MORANGO"=36,
+          "OVOS"=37,
+          "PEPINO"=38,
+          "PERA IMPORTADA"=39,
+          "PIMENTAO VERDE"=40,
+          "QUIABO"=41,
+          "REPOLHO"=42,
+          "TANGERINA"=43,
+          "TOMATE"=44,
+          "UVA ITALIA"=45,
+          "UVA NIAGARA"=46,
+          "VAGEM"=47))),
+    box(
+      title = "Tabela com as medricas dos modelos", 
+      closable = FALSE, 
+      width = 9,
+      solidHeader = TRUE, 
+      status = "navy",
+      collapsible = TRUE,
+      tableOutput("metrics_models")
+    ),
+    box(
+      title = "Gráfico de Treino do modelo", 
+      width = 12,
+      status = "navy", 
+      closable = FALSE,
+      maximizable = TRUE, 
+      solidHeader = TRUE,
+      collapsible = TRUE,
+      tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_training_model"))
+    ),
+    
+    tabBox(
+      title = "Graficos Ruído Branco", 
+      closable = FALSE, 
+      width = 12,
+      status = "navy", 
+      solidHeader = TRUE, 
+      collapsible = FALSE,
+      type = "tabs",
+      selected = "Ruído Branco serie",
+      tabPanel(
+        "Ruído Branco serie",plotly::plotlyOutput("plot_rbs")
+      ) ,
+      tabPanel(
+        "Ruído Branco boxplot",
+        plotly::plotlyOutput("plot_rbb")
+      ))
+    
+  )
+)
 
 # theory_tab ---- 
 theory_tab <- tabItem(
-  tabName = "theory_tab",
-  fluidRow(
-    column(
-      width = 6,
-      tabBox(
-        title = "Modelos Utilizados",
-        elevation = 2,
-        id = "tabcard1",
-        width = 12,
-        collapsible = FALSE, 
-        closable = FALSE,
-        type = "tabs",
-        status = "primary",
-        solidHeader = TRUE,
-        selected = "Prophet",
-        tabPanel(
-          "Prophet",
-          "O modelo Prophet é um modelo de séries temporais desenvolvido pelo Facebook, projetado para fazer previsões de séries temporais com tendência não linear, sazonalidade e feriados. Ele é baseado em uma abordagem de decomposição aditiva, onde a série temporal é dividida em três componentes principais: tendência, sazonalidade e feriados. O modelo Prophet usa uma regressão não linear para modelar a tendência e um modelo de regressão aditiva para modelar sazonalidade e feriados. Ele utiliza técnicas de aprendizado de máquina para selecionar automaticamente os melhores parâmetros para o modelo.
-
-O modelo Prophet é especialmente útil para previsões de curto e médio prazo de séries temporais que contêm sazonalidade e efeitos de feriados. Ele requer pouca ou nenhuma intervenção manual para ajuste de parâmetros e pode lidar com lacunas na série temporal. Além disso, ele fornece intervalos de incerteza para as previsões, o que significa que é possível avaliar o grau de confiança das previsões.
-
-Este modelo é popular na indústria devido à sua facilidade de implementação e desempenho sólido em uma ampla gama de aplicações, desde previsões de vendas até previsões de produção e demanda de energia. No entanto, ele não é recomendado para séries temporais extremamente curtas ou irregularmente espaçadas. 
-Fonte :ChatGPT"),
-        tabPanel(
-          "XGBoost",
-          "O XGBoost é um modelo de aprendizado de máquina muito popular que usa a técnica de boosting para produzir modelos altamente precisos e escaláveis. O modelo é muito útil para previsão de séries temporais, pois é capaz de lidar com dados não lineares e com diferentes escalas de tempo.
-
-Existem algumas considerações importantes ao utilizar o XGBoost na previsão de séries temporais, como a escolha das variáveis usadas para treinar o modelo e a definição correta dos parâmetros de configuração. Aqui estão alguns passos importantes e recomendações para a construção de um modelo XGBoost para previsão de séries temporais:
-
-Preparação dos dados: antes de treinar o modelo, é importante preparar os dados da série temporal. Isso pode incluir a limpeza de dados ausentes ou inconsistentes, a normalização de dados e a agregação de séries temporais em janelas de tempo.
-
-Escolha de variáveis: para prever uma série temporal, é importante escolher as variáveis que podem afetar o resultado. Isso pode incluir variáveis históricas, variáveis ​​externas (por exemplo, dados meteorológicos ou econômicos) e variáveis ​​sazonais.
-
-Configuração de parâmetros: o XGBoost tem muitos parâmetros de configuração que podem afetar a precisão do modelo. Isso inclui parâmetros de regularização, parâmetros de aprendizado e parâmetros relacionados ao número de árvores a serem usadas no modelo.
-
-Treinamento do modelo: depois de preparar os dados e escolher as variáveis, é hora de treinar o modelo. Um método comum para treinar um modelo XGBoost para séries temporais é usar o recurso rolling forecast, onde o modelo é atualizado a cada nova observação de dados.
-
-Avaliação do modelo: finalmente, é importante avaliar o modelo para verificar sua precisão e detectar possíveis problemas. Isso pode incluir a comparação dos resultados previstos com os resultados observados e o uso de técnicas de validação cruzada para testar a robustez do modelo.
-
-Em geral, o modelo XGBoost pode ser uma ferramenta muito poderosa para previsão de séries temporais. No entanto, é importante ter em mente que a construção de um modelo preciso requer um processo cuidadoso de seleção de variáveis, configuração de parâmetros e treinamento do modelo."
-        ),
-        tabPanel(
-          "Arima",
-          "O modelo ARIMA (Autoregressive Integrated Moving Average) é uma técnica de análise de séries temporais que combina a regressão linear com a análise de resíduos. Ele é utilizado para modelar e prever valores futuros de séries temporais, levando em conta o comportamento passado e presente da série.
-
-O modelo ARIMA é composto por três componentes principais: o componente autoregressivo (AR), o componente de média móvel (MA) e o componente de diferenciação (I).
-
-O componente AR é responsável por modelar o comportamento de autocorrelação na série temporal. Ele utiliza valores passados da série para prever valores futuros. O componente MA é responsável por modelar o comportamento de médias móveis na série temporal. Ele utiliza os erros passados da previsão da série para prever valores futuros.
-
-O componente I é responsável por diferenciar a série temporal para torná-la estacionária. Caso a série não seja estacionária, a diferenciação é necessária para eliminar tendências e variações sazonais na série.
-
-O modelo ARIMA utiliza técnicas estatísticas para determinar os parâmetros ótimos para cada componente, com o objetivo de minimizar o erro geral do modelo. O modelo é então utilizado para prever valores futuros da série temporal."
-        )
-      )
-    )
-))
+ "EM BREVE ESTATÍSTICA RESUMIDA BOOK"
+)
 
 
 ########################################
@@ -473,6 +518,12 @@ shinyApp(
           icon = icon("chart-bar")
         ),
         
+        sidebarHeader("Modelos"),
+        menuItem(
+          "Diagnósticos dos Modelos",
+          tabName = "forecast_diag_tab",
+          icon = icon("stethoscope")
+        ),
         sidebarHeader("Modelos"),
         menuItem(
           "Modelos de Previsão",
@@ -817,7 +868,7 @@ shinyApp(
     output$plot_training_model <- plotly::renderPlotly({
       data_traing |> 
       plot_ly() |> 
-      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual"),
+      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual",.index > min_date),
                  x = ~.index,
                  y = ~.value,
                  line = list(color = "rgb(105, 175, 94)"),

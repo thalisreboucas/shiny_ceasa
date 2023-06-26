@@ -30,7 +30,7 @@ rec_nnar <- recipe(value ~ date  , extract_nested_train_split(nested_data_tbl)) 
   timetk::step_timeseries_signature(date)
 ###########################
 
-wflw_prophet_01 <- workflow() %>%
+wflw_prophet <- workflow() %>%
   add_model(prophet_boost(seasonality_daily = F,
                           seasonality_weekly = T,
                           seasonality_yearly = T,
@@ -45,36 +45,8 @@ wflw_prophet_01 <- workflow() %>%
   add_recipe(rec_complete)
 
 
-wflw_prophet_02 <- workflow() %>%
-  add_model(prophet_boost(seasonality_daily = F,
-                          seasonality_weekly = T,
-                          seasonality_yearly = F,
-                          growth = 'linear',
-                          learn_rate = 0.8,
-                          mtry = 5,
-                          trees = 12,
-                          tree_depth =  1000
-  ) %>%
-    set_engine("prophet_xgboost")
-  ) %>%
-  add_recipe(rec_complete)
 
-wflw_prophet_03 <- workflow() %>%
-  add_model(prophet_boost(seasonality_daily = F,
-                          seasonality_weekly = T,
-                          seasonality_yearly = F,
-                          growth = 'linear',
-                          learn_rate = 0.25,
-                          mtry = 5,
-                          trees = 12,
-                          tree_depth =  1000
-  ) %>%
-    set_engine("prophet_xgboost")
-  ) %>%
-  add_recipe(rec_complete)
-
-
-wflw_arima_01 <- workflow() %>%
+wflw_arima <- workflow() %>%
   add_model(arima_boost(learn_rate = 0.3,
                         mtry = 5,
                         trees = 12,
@@ -84,15 +56,6 @@ wflw_arima_01 <- workflow() %>%
   ) %>%
   add_recipe(rec_complete)
 
-wflw_arima_02 <- workflow() %>%
-  add_model(arima_boost(learn_rate = 0.5,
-                        mtry = 5,
-                        trees = 12,
-                        tree_depth = 1000
-  ) %>%
-    set_engine("auto_arima_xgboost")  
-  ) %>%
-  add_recipe(rec_complete)
 
 wflw_nnetar <- workflow() %>%
   add_model(nnetar_reg(epochs = 15,
@@ -106,18 +69,10 @@ wflw_nnetar <- workflow() %>%
 
 remove( rec_complete,
         rec_nnar,
-        wflw_prophet_01,
-        wflw_prophet_02,
-        wflw_prophet_03,
-        wflw_arima_01,
-        wflw_arima_02,
+        wflw_prophet,
+        wflw_arima,
         wflw_nnetar)
 
-###################### Prediction models #################
-
-nested_modeltime_refit_tbl <-   modeltime_nested_refit(object = nested_modeltime_tbl,
-    control = control_nested_refit(verbose = TRUE)
-  )
 
 
 ######################## END OF CODES
@@ -143,6 +98,7 @@ nested_modeltime_refit_tbl %>%
                            .plotly_slider = T )
 }
 
+See_the_Forecast(1)
 # see the resuduals
 
 See_the_Results <- function(product_id){
