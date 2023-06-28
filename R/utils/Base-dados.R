@@ -57,8 +57,8 @@ data_metrics <- nested_modeltime_tbl %>%
   group_by(id) %>% 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
-                      .model_id == 1 ~ "Prophet XG 1",
-                      .model_id == 2 ~ "Arima XG 1",
+                      .model_id == 1 ~ "Prophet XG",
+                      .model_id == 2 ~ "Arima XG",
                       .model_id == 3 ~ "NNAR"
                     ))
 
@@ -76,19 +76,20 @@ actual <- nested_modeltime_tbl %>%
 
 prediction <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%
-  filter(.index >= min_date , .key == "prediction") %>% 
+  filter(.index >= min_date ) %>% 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
                       .model_id == 1 ~ "Prophet XG",
                       .model_id == 2 ~ "Arima XG",
                       .model_id == 3 ~ "NNAR"),
                     pred_value = .value) %>% 
-  select(-.conf_lo,-.conf_hi,-.value) 
+  select(-.conf_lo,-.conf_hi) |> 
+  tidyr::pivot_wider(names_from = .key, values_from = .value)
 
  residual <- dplyr::inner_join(actual,prediction,by = c("id",".index"))  |> 
               dplyr::group_by(id,.index,Name_models) |> 
               dplyr::summarise( residual = .value-pred_value)                      
-
+remove(actual,prediction)
 
 ###################### Prediction models #################
 

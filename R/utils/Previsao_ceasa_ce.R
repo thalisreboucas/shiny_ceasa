@@ -35,9 +35,9 @@ wflw_prophet <- workflow() %>%
                           seasonality_weekly = T,
                           seasonality_yearly = T,
                           growth = 'linear',
-                          learn_rate = 0.3,
+                          learn_rate = 0.01,
                           mtry = 5,
-                          trees = 12,
+                          trees = 14,
                           tree_depth =  1000
   ) %>%
     set_engine("prophet_xgboost")
@@ -47,9 +47,9 @@ wflw_prophet <- workflow() %>%
 
 
 wflw_arima <- workflow() %>%
-  add_model(arima_boost(learn_rate = 0.3,
+  add_model(arima_boost(learn_rate = 0.01,
                         mtry = 5,
-                        trees = 12,
+                        trees = 14,
                         tree_depth = 1000
   ) %>%
     set_engine("auto_arima_xgboost")  
@@ -59,7 +59,7 @@ wflw_arima <- workflow() %>%
 
 wflw_nnetar <- workflow() %>%
   add_model(nnetar_reg(epochs = 15,
-                       num_networks = 100)
+                       num_networks = 500)
   %>%
   set_engine("nnetar") )%>% 
   add_recipe(rec_nnar) 

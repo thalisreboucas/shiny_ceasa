@@ -11,9 +11,7 @@ pacman::p_load(shiny,shinydashboard,
                readxl,
                recipes,
                workflows,
-               parsnip,
-               furrr,
-               tictoc)
+               parsnip)
 
 thematic_shiny()
 
