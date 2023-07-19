@@ -6,3 +6,5 @@
 .httr-oauth
 .DS_Store
 dados.RData
+.RDataTmp1
+.RDataTmp

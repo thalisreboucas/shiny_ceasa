@@ -392,43 +392,7 @@ forcast_tab <- tabItem(
           "TOMATE"=44,
           "UVA ITALIA"=45,
           "UVA NIAGARA"=46,
-          "VAGEM"=47))),
-    box(
-      title = "Tabela com as medricas dos modelos", 
-      closable = FALSE, 
-      width = 9,
-      solidHeader = TRUE, 
-      status = "navy",
-      collapsible = TRUE,
-      tableOutput("metrics_models")
-    ),
-    box(
-      title = "Gráfico de Treino do modelo", 
-      width = 12,
-      status = "navy", 
-      closable = FALSE,
-      maximizable = TRUE, 
-      solidHeader = TRUE,
-      collapsible = TRUE,
-      tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_training_model"))
-    ),
-    
-    tabBox(
-      title = "Graficos Ruído Branco", 
-      closable = FALSE, 
-      width = 12,
-      status = "navy", 
-      solidHeader = TRUE, 
-      collapsible = FALSE,
-      type = "tabs",
-      selected = "Ruído Branco serie",
-      tabPanel(
-        "Ruído Branco serie",plotly::plotlyOutput("plot_rbs")
-      ) ,
-      tabPanel(
-        "Ruído Branco boxplot",
-        plotly::plotlyOutput("plot_rbb")
-      ))
+          "VAGEM"=47)))
     
   )
 )

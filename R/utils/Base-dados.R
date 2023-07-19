@@ -76,7 +76,7 @@ actual <- nested_modeltime_tbl %>%
 
 prediction <- nested_modeltime_tbl %>% 
   extract_nested_test_forecast() %>%
-  filter(.index >= min_date ) %>% 
+  filter(.index >= min_date ,.key != "actual") %>% 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
                       .model_id == 1 ~ "Prophet XG",
