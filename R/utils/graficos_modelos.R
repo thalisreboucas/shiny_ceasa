@@ -33,7 +33,7 @@ add_lines( data = data_traing %>% filter(id == 1,.key == "actual",.index > min_d
 
 nested_modeltime_refit_tbl %>%
   select(id,.actual_data,.future_data) |> 
-  filter(id = 1) |> 
+  filter(id == 1) |> 
   plot_ly() %>%
   add_lines( x = ~.actual_data,
              y = ~.value,

@@ -1,4 +1,3 @@
-library(pacman)
 pacman::p_load(shiny,shinydashboard,
                bs4Dash,bs4cards,waiter,fresh,
                thematic,shinythemes,DT,zoo,plotly, # Making dynamic graphs
