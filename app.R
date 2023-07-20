@@ -391,7 +391,26 @@ forcast_tab <- tabItem(
           "TOMATE"=44,
           "UVA ITALIA"=45,
           "UVA NIAGARA"=46,
-          "VAGEM"=47)))
+          "VAGEM"=47))),
+    box(
+      title = "Tabela com as medidas explorátorias", 
+      closable = FALSE, 
+      width = 9,
+      solidHeader = TRUE, 
+      status = "navy",
+      collapsible = TRUE,
+      tableOutput("tbl_eda_pred")),
+    box(
+      title = "Gráfico de Predição", 
+      width = 12,
+      status = "navy", 
+      closable = FALSE,
+      maximizable = TRUE, 
+      solidHeader = TRUE,
+      collapsible = TRUE,
+      tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_prediction_model"))
+    )
+    
     
   )
 )
@@ -829,7 +848,9 @@ shinyApp(
     output$plot_training_model <- plotly::renderPlotly({
       data_traing |> 
       plot_ly() |> 
-      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual",.index > min_date),
+      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual",.index > min(data_traing |> 
+                                                                                              filter(.key == "prediction") |> 
+                                                                                              pull(.index))),
                  x = ~.index,
                  y = ~.value,
                  line = list(color = "rgb(105, 175, 94)"),
@@ -900,6 +921,48 @@ shinyApp(
     
     
     
+    
+    
+    output$plot_prediction_model <- plotly::renderPlotly({
+      data_pretiction |> 
+        plot_ly() |> 
+        add_lines( data = data_pretiction |>  filter(id == item_2(),.key == "actual",.index > min(data_traing |> 
+                                                                                                filter(.key == "prediction") |> 
+                                                                                                pull(.index))),
+                   x = ~.index,
+                   y = ~.value,
+                   line = list(color = "rgb(105, 175, 94)"),
+                   name = "Dados") |> 
+        add_lines( data = data_traing |>  
+                     group_by(.model_id) |> 
+                     filter(id == item_2(),.key == "prediction"),
+                   x = ~.index,
+                   y = ~.value,
+                   color = ~.model_desc,
+                   name = ~Name_models) |> 
+        # add_ribbons(x ~.index,
+        #             ymin = ~.conf_lo,
+        #              ymax = ~.conf_hi,
+        #             color = ~Name_models) |>  
+        layout(showlegend = T,
+               title='',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = "Dia",
+                            gridcolor = 'ffff',
+                            rangeslider = list(visible = T)))
+      
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
     ##### tab 1 ---- actual price ###################
     output$tbl <- DT::renderDataTable({
       data |>  dplyr::mutate(my = zoo::as.yearmon(date)) |>  
@@ -939,6 +1002,28 @@ shinyApp(
                                                          Maxímo = max(.value),
                                                          Amplitude = (max(.value) -min(.value))) 
                                      
+    })
+    
+    
+    
+    output$tbl_eda_pred <- renderTable({ data_pretiction |> 
+        dplyr::group_by(id) |> 
+        dplyr::filter(id == item_2()) |>  
+        timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::group_by(year) |>  
+        dplyr::filter(year == year_violin()) |> 
+        dplyr::rename(Ano = year) |> 
+        dplyr::summarize( Mínimo = min(.value),
+                          Média = mean(.value),`Desvio Padrão` = sd(.value) , 
+                          IQR = IQR(.value) , 
+                          Curtose = as.numeric(kurtosis(.value)) , 
+                          Assimetria = as.numeric(skewness(.value)),
+                          Q1 = stats::quantile(.value,probs = 0.25, na.rm = TRUE), 
+                          Mediana = median(.value),
+                          Q3 = stats::quantile(.value,probs = 0.75, na.rm = TRUE),
+                          Maxímo = max(.value),
+                          Amplitude = (max(.value) -min(.value))) 
+      
     })
     
     

@@ -34,6 +34,8 @@ data_train <- train(data)
 
 ###################### Prediction models #################
 
-nested_modeltime_refit_tbl <-   modeltime_nested_refit(object = nested_modeltime_tbl,
+data_pretiction <-   modeltime_nested_refit(object = nested_modeltime_tbl,
                                                        control = control_nested_refit(verbose = TRUE)
-)
+) |> extract_nested_future_forecast()
+
+
