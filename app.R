@@ -334,7 +334,7 @@ forcast_model_tab <- tabItem(
 )
 
 
-# forcast_model_tab ############
+# prediction_model_tab ############
 
 forecast_tab <- tabItem(
   tabName = "4cast_tab",
@@ -464,7 +464,7 @@ shinyApp(
           ###### Notification item ##########
           notificationItem(
             inputId = "triggerAction2",
-            text = "Dados de 31/03/2023 ",
+            text = "Dados de 31/06/2023 ",
             status = "success"
           )
           ################################
@@ -527,6 +527,7 @@ shinyApp(
         actual_price_tab,
         analises_tab,
         forcast_model_tab,
+        forecast_tab,
         theory_tab
       )
     ),
@@ -543,43 +544,7 @@ shinyApp(
     item <- reactive(as.numeric({input$item}))
     item_2 <- reactive(as.numeric({input$item_2}))
     year_violin <- reactive(as.numeric({input$year_violin}))
-    # alerts ------------------------------------------------------------------
-    observeEvent(input$show_alert, {
-      print("created")
-      createAlert(
-        id = "alert_anchor",
-        options = list(
-          title = "Be Careful!",
-          status = "danger",
-          closable = TRUE,
-          width = 12,
-          content = "Danger alert preview. This alert is dismissable. 
-          A wonderful serenity has taken possession of my entire soul, 
-          like these sweet mornings of spring which 
-          I enjoy with my whole heart."
-        )
-      )
-    })
-    
-    observeEvent(input$hide_alert, {
-      print("deleted")
-      closeAlert(id = "alert_anchor")
-    })
-    
-    # alert callback event
-    observeEvent(input$alert_anchor, {
-      alertStatus <- if (input$alert_anchor) "opened" else "closed"
-      toastColor <- if (input$alert_anchor) "bg-lime" else "bg-fuchsia"
-      toast(
-        title = sprintf("Alert succesfully %s!", alertStatus),
-        options = list(
-          class = toastColor,
-          autohide = TRUE,
-          position = "bottomRight"
-        )
-      )
-    })
-    
+  
     
     # plots -------------------------------------------------------------------
     
@@ -865,10 +830,6 @@ shinyApp(
                  y = ~.value,
                  color = ~.model_desc,
                  name = ~Name_models) |> 
-      # add_ribbons(x ~.index,
-      #             ymin = ~.conf_lo,
-      #              ymax = ~.conf_hi,
-      #             color = ~Name_models) |>  
       layout(showlegend = T,
              title='',
              yaxis = list(title = "Preço",
@@ -943,10 +904,9 @@ shinyApp(
                    y = ~.value,
                    color = ~.model_desc,
                    name = ~Name_models) |> 
-        # add_ribbons(x ~.index,
-        #             ymin = ~.conf_lo,
-        #              ymax = ~.conf_hi,
-        #             color = ~Name_models) |>  
+         add_ribbons(x ~.index,
+                     ymin = ~.conf_lo,
+                     ymax = ~.conf_hi) |>  
         layout(showlegend = T,
                title='',
                yaxis = list(title = "Preço",

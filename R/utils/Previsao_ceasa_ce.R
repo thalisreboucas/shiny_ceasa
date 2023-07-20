@@ -1,4 +1,4 @@
-train <- function(data){
+forecast <- function(data){
 
 nested_data_tbl <- data |> 
   extend_timeseries(
@@ -68,9 +68,10 @@ nested_modeltime_tbl <- modeltime_nested_fit(
   wflw_prophet,
   wflw_arima,
   wflw_nnetar
-) |> extract_nested_test_forecast()
+) 
 
 data_traing <- nested_modeltime_tbl|> 
+  extract_nested_test_forecast() |> 
   group_by(id)|> 
   dplyr::mutate ( Name_models =
                     dplyr::case_when(
@@ -79,7 +80,13 @@ data_traing <- nested_modeltime_tbl|>
                       .model_id == 3 ~ "NNAR"
                     ))
 
-return(data_traing) }
+data_prediction <-   modeltime_nested_refit(object = nested_modeltime_tbl,
+                                            control = control_nested_refit(verbose = TRUE)
+) |> extract_nested_future_forecast()
+
+
+return(list("data_traing" = data_traing, "data_prediction" = data_prediction)) 
+}
 
 
 

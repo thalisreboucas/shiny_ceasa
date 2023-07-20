@@ -30,13 +30,15 @@ pt <- list(
   )
 
 
-data_traing  <- train(data)
+# Função para todas as bases nescessarias
+forecast  <- forecast(data)
 
-residual <- res(list_train$data_traing)
+# Bases de dados para o Shiny
+data_traing <- forecast$data_traing
+data_prediction <- forecast$data_pretiction
+residual <- res(data_traing)
 
-data_pretiction <-   modeltime_nested_refit(object = nested_modeltime_tbl,
-                                                       control = control_nested_refit(verbose = TRUE)
-) |> extract_nested_future_forecast()
+
 
 
 
