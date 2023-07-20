@@ -332,14 +332,17 @@ forcast_model_tab <- tabItem(
   )
 )
 
-forcast_tab <- tabItem(
-  tabName = "forecast_tab",
+
+# forcast_model_tab ############
+
+forecast_tab <- tabItem(
+  tabName = "4cast_tab",
   fluidRow(
     box(
       closable = FALSE, 
       width = 3,
       solidHeader = TRUE, 
-      status = "navy",
+      status = "primary",
       collapsible = TRUE,
       selectInput(
         inputId = "item_2",
@@ -397,26 +400,25 @@ forcast_tab <- tabItem(
       closable = FALSE, 
       width = 9,
       solidHeader = TRUE, 
-      status = "navy",
+      status = "primary",
       collapsible = TRUE,
       tableOutput("tbl_eda_pred")),
     box(
       title = "Gráfico de Predição", 
       width = 12,
-      status = "navy", 
+      status = "primary", 
       closable = FALSE,
       maximizable = TRUE, 
       solidHeader = TRUE,
       collapsible = TRUE,
-      tabPanel("Gráfico de Treino",plotly::plotlyOutput("plot_prediction_model"))
+      tabPanel("Gráfico de Predição",plotly::plotlyOutput("plot_prediction_model"))
     )
-    
-    
   )
 )
 
 # theory_tab ---- 
 theory_tab <- tabItem(
+  tabName = "theory_tab",
  "EM BREVE ESTATÍSTICA RESUMIDA BOOK"
 )
 
@@ -504,12 +506,12 @@ shinyApp(
           tabName = "forecast_diag_tab",
           icon = icon("stethoscope")
         ),
-        sidebarHeader("Modelos"),
         menuItem(
           "Modelos de Previsão",
-          tabName = "forecast_tab",
+          tabName = "4cast_tab",
           icon = icon("chart-line")
         ),
+        sidebarHeader("Teoria"),
         menuItem(
           "Teoria dos Modelos",
           tabName = "theory_tab",
