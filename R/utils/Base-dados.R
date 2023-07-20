@@ -30,12 +30,14 @@ pt <- list(
   )
 
 
-data_train <- train(data)
+data_traing  <- train(data)
 
-###################### Prediction models #################
+residual <- res(list_train$data_traing)
 
 data_pretiction <-   modeltime_nested_refit(object = nested_modeltime_tbl,
                                                        control = control_nested_refit(verbose = TRUE)
 ) |> extract_nested_future_forecast()
+
+
 
 

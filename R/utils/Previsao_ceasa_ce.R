@@ -79,46 +79,32 @@ data_traing <- nested_modeltime_tbl|>
                       .model_id == 3 ~ "NNAR"
                     ))
 
-data_metrics <- nested_modeltime_tbl|> 
-  group_by(id)|> 
-  dplyr::mutate ( Name_models =
-                    dplyr::case_when(
-                      .model_id == 1 ~ "Prophet XG",
-                      .model_id == 2 ~ "Arima XG",
-                      .model_id == 3 ~ "NNAR"
-                    ))
+return(data_traing) }
 
 
-actual <- nested_modeltime_tbl|> 
-  filter(.key == "actual",.index >= min(nested_modeltime_tbl |> 
-                         extract_nested_test_forecast() |> 
-                         filter(.key == "prediction") |> 
-                         pull(.index))) |> 
-  dplyr::select(-.model_id,-.model_desc,-.conf_lo,-.conf_hi) 
 
-prediction <- nested_modeltime_tbl|> 
-  filter(.key != "actual", .index >= min(nested_modeltime_tbl |> 
-                                             filter(.key == "prediction") |> 
-                                             pull(.index))) |> 
-  dplyr::mutate ( Name_models =
-                    dplyr::case_when(
-                      .model_id == 1 ~ "Prophet XG",
-                      .model_id == 2 ~ "Arima XG",
-                      .model_id == 3 ~ "NNAR"),
-                  pred_value = .value)|> 
-  select(-.conf_lo,-.conf_hi) |> 
+res <- function(data_traing){
+  
+actual <- data_traing|> 
+  dplyr::filter(.key == "actual",.index >= min(data_traing |> 
+                                          dplyr::filter(.key == "prediction") |> 
+                                          pull(.index))) |> 
+  dplyr::select(-.model_id,-.model_desc,-.conf_lo,-.conf_hi,-Name_models) 
+
+prediction <- data_traing|> 
+  dplyr::filter(.key != "actual", .index >= min(data_traing |> 
+                                           filter(.key == "prediction") |> 
+                                           pull(.index))) |> 
+  dplyr::mutate (pred_value = .value)|> 
+  dplyr::select(-.conf_lo,-.conf_hi) |> 
   tidyr::pivot_wider(names_from = .key, values_from = .value)
 
 residual <- dplyr::inner_join(actual,prediction,by = c("id",".index"))  |> 
   dplyr::group_by(id,.index,Name_models) |> 
-  dplyr::summarise( residual = pred_value-.value,.groups = 'drop') 
-  
-lista <- list(nested_data_tbl,residual,data_metrics,data_traing)
-names(lista) <-c("nested_data_tbl","residual","data_metrics","data_traing")
+  dplyr::mutate( residual = pred_value-.value,.groups = 'drop') |> 
+  dplyr::select(-prediction,-.groups,-.model_desc)
 
-return(lista) }
-
-
-
+return(residual)
+}
 
 

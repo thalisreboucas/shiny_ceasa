@@ -10,7 +10,8 @@ pacman::p_load(shiny,shinydashboard,
                readxl,
                recipes,
                workflows,
-               parsnip)
+               parsnip,
+               Metrics)
 
 thematic_shiny()
 
@@ -293,7 +294,7 @@ forcast_model_tab <- tabItem(
           "UVA NIAGARA"=46,
           "VAGEM"=47))),
     box(
-      title = "Tabela com as medricas dos modelos", 
+      title = "Tabela com as metricas dos modelos", 
       closable = FALSE, 
       width = 9,
       solidHeader = TRUE, 
@@ -850,14 +851,14 @@ shinyApp(
     output$plot_training_model <- plotly::renderPlotly({
       data_traing |> 
       plot_ly() |> 
-      add_lines( data = data_traing |>  filter(id == item_2(),.key == "actual",.index > min(data_traing |> 
+      add_lines( data = data_traing  |>  filter(id == item_2(),.key == "actual",.index > min(data_traing  |> 
                                                                                               filter(.key == "prediction") |> 
                                                                                               pull(.index))),
                  x = ~.index,
                  y = ~.value,
                  line = list(color = "rgb(105, 175, 94)"),
                  name = "Dados") |> 
-      add_lines( data = data_traing |>  
+      add_lines( data = data_traing  |>  
                    group_by(.model_id) |> 
                    filter(id == item_2(),.key == "prediction"),
                  x = ~.index,
@@ -928,14 +929,14 @@ shinyApp(
     output$plot_prediction_model <- plotly::renderPlotly({
       data_pretiction |> 
         plot_ly() |> 
-        add_lines( data = data_pretiction |>  filter(id == item_2(),.key == "actual",.index > min(data_traing |> 
+        add_lines( data = data_pretiction |>  filter(id == item_2(),.key == "actual",.index > min(data_traing  |> 
                                                                                                 filter(.key == "prediction") |> 
                                                                                                 pull(.index))),
                    x = ~.index,
                    y = ~.value,
                    line = list(color = "rgb(105, 175, 94)"),
                    name = "Dados") |> 
-        add_lines( data = data_traing |>  
+        add_lines( data = data_traing  |>  
                      group_by(.model_id) |> 
                      filter(id == item_2(),.key == "prediction"),
                    x = ~.index,
@@ -1030,26 +1031,27 @@ shinyApp(
     
     
     output$metrics_models <- renderTable({
-                              a <- data_metrics |>  
-                              dplyr::filter(id == item_2()) |>  
-                              dplyr::select(-id,-.model_id,-.model_desc,-.type) |> 
-                              dplyr::rename(Modelo = Name_models) |> 
-                              dplyr::select(Modelo,mae,mape,mase,smape,rmse,rsq) 
-                              b <- residual |> dplyr::filter(id == item_2())|> 
-                                dplyr::ungroup() |> 
-                                dplyr::group_by(Name_models) |> 
-                                dplyr::rename(Modelo = Name_models) |> 
-                                dplyr::summarise( Média = mean(residual), 
-                                                  `Desvio Padrão` = sd(residual),
-                                                  Mediana = median(residual),
-                                                  `Teste Shapiro` = (if(shapiro.test(residual)$p.value > 0.05 )
-                                                    "Normal"
-                                                    else "Não Normal"),
-                                                  `Teste Box-Pierce` = (if(stats::Box.test(residual)$p.value > 0.05 )
-                                                    "Independente"
-                                                    else "Dependente"))
-                              
-                              inner_join(a,b,by = "Modelo") 
+      residual |> dplyr::filter(id == item_2())|> 
+        dplyr::ungroup() |> 
+        dplyr::group_by(Name_models) |> 
+        dplyr::rename(Modelo = Name_models) |> 
+        dplyr::summarise( Mae = mae(.value,pred_value) ,
+                          Mape = mape(.value,pred_value) ,
+                          Mase = mase(.value,pred_value),
+                          smape = smape(.value,pred_value),
+                          rmse = rmse(.value,pred_value),
+                          rsq = cor(.value,pred_value)^2 ,
+                          Média = mean(residual), 
+                          `Desvio Padrão` = sd(residual),
+                          Mediana = median(residual),
+                          `Teste Shapiro` = (if(shapiro.test(residual)$p.value > 0.05 )
+                            "Normal"
+                            else "Não Normal"),
+                          `Teste Box-Pierce` = (if(stats::Box.test(residual)$p.value > 0.05 )
+                            "Independente"
+                            else "Dependente"))
+      
+
     })
     
    output$tbl_1 <- DT::renderDataTable({
