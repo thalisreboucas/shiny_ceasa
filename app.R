@@ -346,7 +346,7 @@ forecast_tab <- tabItem(
       status = "primary",
       collapsible = TRUE,
       selectInput(
-        inputId = "item_2",
+        inputId = "item_3",
         label = "Escolha o item:",
         c(
           "ABACATE"=1,
@@ -397,14 +397,6 @@ forecast_tab <- tabItem(
           "UVA NIAGARA"=46,
           "VAGEM"=47))),
     box(
-      title = "Tabela com as medidas explorátorias", 
-      closable = FALSE, 
-      width = 9,
-      solidHeader = TRUE, 
-      status = "primary",
-      collapsible = TRUE,
-      tableOutput("tbl_eda_pred")),
-    box(
       title = "Gráfico de Predição", 
       width = 12,
       status = "primary", 
@@ -413,7 +405,15 @@ forecast_tab <- tabItem(
       solidHeader = TRUE,
       collapsible = TRUE,
       tabPanel("Gráfico de Predição",plotly::plotlyOutput("plot_prediction_model"))
-    )
+    ),
+    box(
+      title = "Tabela com as medidas explorátorias", 
+      closable = FALSE, 
+      width = 12,
+      solidHeader = TRUE, 
+      status = "primary",
+      collapsible = TRUE,
+      tableOutput("tbl_eda_pred"))
   )
 )
 
@@ -543,6 +543,7 @@ shinyApp(
     useAutoColor(T)
     item <- reactive(as.numeric({input$item}))
     item_2 <- reactive(as.numeric({input$item_2}))
+    item_3 <- reactive(as.numeric({input$item_3}))
     year_violin <- reactive(as.numeric({input$year_violin}))
   
     
@@ -893,7 +894,7 @@ shinyApp(
       data_prediction |> 
         plot_ly() |> 
         add_lines( data = data_prediction |>  
-                     dplyr::filter(id == 1,
+                     dplyr::filter(id == item_3(),
                                    .key == "actual",
                                    Ano >= 2023),
                    x = ~.index,
@@ -902,7 +903,7 @@ shinyApp(
                    name = "Dados") |> 
         add_lines( data = data_prediction  |>  
                      group_by(.model_id) |> 
-                     filter(id == 1,.key == "prediction"),
+                     filter(id == item_3(),.key == "prediction"),
                    x = ~.index,
                    y = ~.value,
                    color = ~.model_desc,
@@ -917,13 +918,6 @@ shinyApp(
                             rangeslider = list(visible = T)))
       
     })
-    
-    
-    
-    
-    
-    
-    
     
     
     ##### tab 1 ---- actual price ###################
@@ -970,19 +964,23 @@ shinyApp(
     
     
     output$tbl_eda_pred <- renderTable({ data_prediction |> 
-        dplyr::group_by(id) |> 
-        dplyr::filter(id == item_2(),.key=="prediction") |>  
-        timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
+        dplyr::group_by(id,Mes,Name_models) |> 
+        dplyr::filter(id == item_3(),.key=="prediction") |>  
+        dplyr::mutate(Mes = case_when( Mes == 5 ~ "Maio",
+                                       Mes == 6 ~ "Junho",
+                                       Mes == 7 ~ "Julho")) |> 
         dplyr::summarize( Mínimo = min(.value),
                           Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                           IQR = IQR(.value) , 
+                          Mad = mad(.value),
                           Curtose = as.numeric(kurtosis(.value)) , 
                           Assimetria = as.numeric(skewness(.value)),
                           Q1 = stats::quantile(.value,probs = 0.25, na.rm = TRUE), 
                           Mediana = median(.value),
                           Q3 = stats::quantile(.value,probs = 0.75, na.rm = TRUE),
                           Maxímo = max(.value),
-                          Amplitude = (max(.value) -min(.value))) 
+                          Amplitude = (max(.value) -min(.value)),
+                          Dias = length(.value)) 
       
     })
     

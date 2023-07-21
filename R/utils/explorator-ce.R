@@ -245,4 +245,22 @@ data %>% filter(id ==1 )%>%
         dplyr::mutate(Produto = paste(produte,unit)) %>% 
         dplyr::group_by(my,Produto) %>% View()
 
+      data_prediction |> 
+        dplyr::group_by(id,Mes,Name_models) |> 
+        dplyr::filter(id == 1,.key=="prediction") |>  
+        dplyr::mutate(Mes = case_when( Mes == 5 ~ "Maio",
+                                       Mes == 6 ~ "Junho",
+                                       Mes == 7 ~ "Julho")) |> 
+        dplyr::summarize( Mínimo = min(.value),
+                          Média = mean(.value),`Desvio Padrão` = sd(.value) , 
+                          IQR = IQR(.value) , 
+                          Mad = mad(.value),
+                          Curtose = as.numeric(kurtosis(.value)) , 
+                          Assimetria = as.numeric(skewness(.value)),
+                          Q1 = stats::quantile(.value,probs = 0.25, na.rm = TRUE), 
+                          Mediana = median(.value),
+                          Q3 = stats::quantile(.value,probs = 0.75, na.rm = TRUE),
+                          Maxímo = max(.value),
+                          Amplitude = (max(.value) -min(.value)),
+                          Dias = length(.value)) 
    
