@@ -59,3 +59,36 @@ nested_modeltime_refit_tbl %>%
                       gridcolor = 'ffff',
                       rangeslider = list(visible = T)))
 
+
+
+data_prediction |> 
+        plot_ly() |> 
+        add_lines( data = data_prediction |>  
+                     dplyr::filter(id == 1,
+                                   .key == "actual",
+                                   Ano >= 2023),
+                   x = ~.index,
+                   y = ~.value,
+                   line = list(color = "rgb(105, 175, 94)"),
+                   name = "Dados") |> 
+        add_lines( data = data_prediction  |>  
+                     group_by(.model_id) |> 
+                     filter(id == 1,.key == "prediction"),
+                   x = ~.index,
+                   y = ~.value,
+                   color = ~.model_desc,
+                   name = ~Name_models) |> 
+   add_ribbons(x ~.index,
+                ymin = ~.conf_lo,
+                ymax = ~.conf_hi,
+                colors = ~.
+                line = list(color = 'transparent')) %>% 
+        layout(showlegend = T,
+               title='',
+               yaxis = list(title = "Preço",
+                            tickprefix = "R$",
+                            gridcolor = 'ffff'),
+               xaxis = list(title = "Dia",
+                            gridcolor = 'ffff',
+                            rangeslider = list(visible = T)))
+      

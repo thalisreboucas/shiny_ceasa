@@ -816,9 +816,11 @@ shinyApp(
     output$plot_training_model <- plotly::renderPlotly({
       data_traing |> 
       plot_ly() |> 
-      add_lines( data = data_traing  |>  filter(id == item_2(),.key == "actual",.index > min(data_traing  |> 
-                                                                                              filter(.key == "prediction") |> 
-                                                                                              pull(.index))),
+      add_lines( data = data_traing  |>  filter(id == item_2(),
+                                                .key == "actual",
+                                                .index > min(data_traing  |> 
+                                                filter(.key == "prediction") |>
+                                                pull(.index))),
                  x = ~.index,
                  y = ~.value,
                  line = list(color = "rgb(105, 175, 94)"),
@@ -888,25 +890,23 @@ shinyApp(
     
     
     output$plot_prediction_model <- plotly::renderPlotly({
-      data_pretiction |> 
+      data_prediction |> 
         plot_ly() |> 
-        add_lines( data = data_pretiction |>  filter(id == item_2(),.key == "actual",.index > min(data_traing  |> 
-                                                                                                filter(.key == "prediction") |> 
-                                                                                                pull(.index))),
+        add_lines( data = data_prediction |>  
+                     dplyr::filter(id == 1,
+                                   .key == "actual",
+                                   Ano >= 2023),
                    x = ~.index,
                    y = ~.value,
                    line = list(color = "rgb(105, 175, 94)"),
                    name = "Dados") |> 
-        add_lines( data = data_traing  |>  
+        add_lines( data = data_prediction  |>  
                      group_by(.model_id) |> 
-                     filter(id == item_2(),.key == "prediction"),
+                     filter(id == 1,.key == "prediction"),
                    x = ~.index,
                    y = ~.value,
                    color = ~.model_desc,
                    name = ~Name_models) |> 
-         add_ribbons(x ~.index,
-                     ymin = ~.conf_lo,
-                     ymax = ~.conf_hi) |>  
         layout(showlegend = T,
                title='',
                yaxis = list(title = "Preço",
@@ -969,13 +969,10 @@ shinyApp(
     
     
     
-    output$tbl_eda_pred <- renderTable({ data_pretiction |> 
+    output$tbl_eda_pred <- renderTable({ data_prediction |> 
         dplyr::group_by(id) |> 
-        dplyr::filter(id == item_2()) |>  
+        dplyr::filter(id == item_2(),.key=="prediction") |>  
         timetk::tk_seasonal_diagnostics(.date_var = date,.value = value) |>  
-        dplyr::group_by(year) |>  
-        dplyr::filter(year == year_violin()) |> 
-        dplyr::rename(Ano = year) |> 
         dplyr::summarize( Mínimo = min(.value),
                           Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                           IQR = IQR(.value) , 
