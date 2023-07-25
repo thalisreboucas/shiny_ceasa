@@ -1,0 +1,12 @@
+name: shiny_ceasa
+title: shiny_ceasa
+username: thalisreboucas
+account: thalisreboucas
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9501856
+bundleId: 7491773
+url: https://thalisreboucas.shinyapps.io/shiny_ceasa/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

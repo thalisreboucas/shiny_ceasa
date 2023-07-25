@@ -1,5 +1,5 @@
 # Base preço dos alimentos Ceasa
-data <- readxl::read_excel("E:/Thalis/MEU/shiny_ceasa/R/utils/Dados.xlsx", 
+data <- readxl::read_excel("R/utils/Dados.xlsx", 
                                 col_types = c("text", "text", "text", "numeric", "date")) |> 
   dplyr::select(id,produte,unit,date,value) |>  
   tidyr::drop_na()
