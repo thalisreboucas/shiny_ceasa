@@ -1,5 +1,4 @@
 
-
 data_traing %>%
   plot_ly() %>%
 add_lines( data = data_traing %>% filter(id == 1,.key == "actual",.index > min_date),

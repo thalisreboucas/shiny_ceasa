@@ -420,7 +420,7 @@ forecast_tab <- tabItem(
 # theory_tab ---- 
 theory_tab <- tabItem(
   tabName = "theory_tab",
- "EM BREVE ESTATÍSTICA RESUMIDA BOOK"
+ "https://thalisreboucas.github.io/Estatistica_Resumida_Book/"
 )
 
 
@@ -966,9 +966,9 @@ shinyApp(
     output$tbl_eda_pred <- renderTable({ data_prediction |> 
         dplyr::group_by(id,Mes,Name_models) |> 
         dplyr::filter(id == item_3(),.key=="prediction") |>  
-        dplyr::mutate(Mes = case_when( Mes == 5 ~ "Maio",
-                                       Mes == 6 ~ "Junho",
-                                       Mes == 7 ~ "Julho")) |> 
+        dplyr::mutate(Mes = case_when( Mes == 1 ~ "Janeiro",
+                                       Mes == 2 ~ "fevereiro",
+                                       Mes == 3 ~ "março")) |> 
         dplyr::summarize( Mínimo = min(.value),
                           Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                           IQR = IQR(.value) , 

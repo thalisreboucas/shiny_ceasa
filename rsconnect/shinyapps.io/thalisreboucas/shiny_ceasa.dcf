@@ -5,7 +5,7 @@ account: thalisreboucas
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9501856
-bundleId: 7491773
+bundleId:
 url: https://thalisreboucas.shinyapps.io/shiny_ceasa/
 version: 1
 asMultiple: FALSE
