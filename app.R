@@ -450,7 +450,7 @@ shinyApp(
             message = "Dados atualizados até o fim de Março",
             from = "Thalis Rebouças",
             image = "https://thalisreboucas.com.br/images/all/1.jpg",
-            time = "31/03/2023",
+            time = "31/12/2023",
             color = "orange"
           )
           ###################################
@@ -464,7 +464,7 @@ shinyApp(
           ###### Notification item ##########
           notificationItem(
             inputId = "triggerAction2",
-            text = "Dados de 31/06/2023 ",
+            text = "Dados de 31/12/2023 ",
             status = "success"
           )
           ################################
@@ -533,7 +533,7 @@ shinyApp(
     ),
     footer = dashboardFooter(
       fixed = FALSE,
-      right = "© THALIS REBOUÇAS 2023 / TODOS OS DIREITOS RESERVADOS."
+      right = "© THALIS REBOUÇAS 2024 / TODOS OS DIREITOS RESERVADOS."
     ),
     title = "Ceasa dash"
   ),

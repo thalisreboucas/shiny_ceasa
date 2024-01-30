@@ -248,9 +248,20 @@ data %>% filter(id ==1 )%>%
       data_prediction |> 
         dplyr::group_by(id,Mes,Name_models) |> 
         dplyr::filter(id == 1,.key=="prediction") |>  
-        dplyr::mutate(Mes = case_when( Mes == 5 ~ "Maio",
+        dplyr::mutate(Mes = case_when( Mes == 1 ~ "Janeiro",
+                                       Mes == 2 ~ "Feveiro",
+                                       Mes == 3 ~ "Março",
+                                       Mes == 4 ~ "Abril",
+                                       Mes == 5 ~ "Maio",
                                        Mes == 6 ~ "Junho",
-                                       Mes == 7 ~ "Julho")) |> 
+                                       Mes == 7 ~ "Julho",
+                                       Mes == 8 ~ "Agosto",
+                                       Mes == 9 ~ "Setembro",
+                                       Mes == 10 ~ "Outubro",
+                                       Mes == 11 ~ "Novembro",
+                                       Mes == 12 ~ "Dezembro"
+                                       
+        )) |> 
         dplyr::summarize( Mínimo = min(.value),
                           Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                           IQR = IQR(.value) , 
