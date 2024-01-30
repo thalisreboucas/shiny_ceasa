@@ -31,7 +31,19 @@ pt <- list(
 
 
 # Função para todas as bases nescessarias
+forecast  <- forecast(data)
 
+# Bases de dados para o Shiny
+data_traing <- forecast$data_traing
+data_prediction <- forecast$data_pretiction |> dplyr::mutate ( Name_models =
+                                                                 dplyr::case_when(
+                                                                   .model_id == 1 ~ "Prophet XG",
+                                                                   .model_id == 2 ~ "Arima XG",
+                                                                   .model_id == 3 ~ "NNAR"),
+                                                               Ano = year(.index),
+                                                               Mes = month(.index)
+)
+residual <- res(data_traing)
 
 
 
