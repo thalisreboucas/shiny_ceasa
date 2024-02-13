@@ -166,8 +166,8 @@ actual_price_tab <- tabItem(
       multiple = TRUE,
       inputId = "year_violin",
       label = "Escolha o ano:",
-      choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023),
-      selected = 2023)
+      choices = c(2015,2016,2017,2018,2019,2020,2021,2022,2023,2024),
+      selected = 2024)
     ),
     box(
       title = "Tabela com medidas de escala e dispersão", 
@@ -447,10 +447,10 @@ shinyApp(
           ######## Messagem item ##############
           messageItem(
             inputId = "triggerAction1",
-            message = "Dados atualizados até o fim de Março",
+            message = "Dados atualizados até fevereiro de 2024",
             from = "Thalis Rebouças",
             image = "https://thalisreboucas.com.br/images/all/1.jpg",
-            time = "31/12/2023",
+            time = "13/02/2024",
             color = "orange"
           )
           ###################################
@@ -464,7 +464,7 @@ shinyApp(
           ###### Notification item ##########
           notificationItem(
             inputId = "triggerAction2",
-            text = "Dados de 31/12/2023 ",
+            text = "Dados de 13/02/2024 ",
             status = "success"
           )
           ################################
@@ -967,8 +967,20 @@ shinyApp(
         dplyr::group_by(id,Mes,Name_models) |> 
         dplyr::filter(id == item_3(),.key=="prediction") |>  
         dplyr::mutate(Mes = case_when( Mes == 1 ~ "Janeiro",
-                                       Mes == 2 ~ "fevereiro",
-                                       Mes == 3 ~ "março")) |> 
+                                       Mes == 2 ~ "Fevereiro",
+                                       Mes == 3 ~ "Março",
+                                       Mes == 4 ~  "Abril",
+                                       Mes == 5 ~  "Maio",
+                                       Mes == 6 ~  "Junho",
+                                       Mes == 7 ~  "Julho",
+                                       Mes == 8 ~  "Agosto",
+                                       Mes == 9 ~  "Setembro",
+                                       Mes == 10 ~  "Outubro",
+                                       Mes == 11 ~  "Novembro",
+                                       Mes == 12 ~  "Dezembro"
+                                       
+                                       
+        )) |> 
         dplyr::summarize( Mínimo = min(.value),
                           Média = mean(.value),`Desvio Padrão` = sd(.value) , 
                           IQR = IQR(.value) , 
